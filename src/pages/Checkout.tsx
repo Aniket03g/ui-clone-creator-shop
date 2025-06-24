@@ -166,7 +166,7 @@ const Checkout = () => {
                 <Checkbox 
                   id="sameAddress" 
                   checked={sameAsBilling}
-                  onCheckedChange={setSameAsBilling}
+                  onCheckedChange={(checked) => setSameAsBilling(checked === true)}
                 />
                 <Label htmlFor="sameAddress">Same as shipping address</Label>
               </div>
