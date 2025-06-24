@@ -8,77 +8,41 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Search, Heart, User, CreditCard } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
+import Header from '@/components/Header';
+import { useCart } from '@/contexts/CartContext';
 
 const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [sameAsBilling, setSameAsBilling] = useState(false);
+  const { cartItems, getTotalPrice } = useCart();
 
-  const orderItems = [
-    { name: 'TechBook Pro 15', category: 'Laptop', price: 1299 },
-    { name: 'NetLink 6000', category: 'Wi-Fi Router', price: 149 },
-    { name: 'VisionDesk 27', category: 'All-in-One PC', price: 1799 },
-    { name: 'PowerGuard 1000', category: 'UPS System', price: 249 }
-  ];
-
-  const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
-  const tax = 244.72;
+  const subtotal = getTotalPrice();
+  const tax = subtotal * 0.18; // 18% GST for India
   const total = subtotal + tax;
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-3xl font-bold text-stone-900 mb-4">No Items to Checkout</h1>
+            <p className="text-stone-600 mb-8">Your cart is empty. Add some products first!</p>
+            <Link to="/store">
+              <Button className="bg-red-600 hover:bg-red-700 text-white">
+                Continue Shopping
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-bold text-stone-900">
-                TechShop
-              </Link>
-              <nav className="hidden md:flex space-x-6">
-                <Link to="/store" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Store
-                </Link>
-                <Link to="/laptops" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Laptops
-                </Link>
-                <Link to="/routers" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Wi-Fi Routers
-                </Link>
-                <Link to="/pcs" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  All-in-One PCs
-                </Link>
-                <Link to="/ups" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  UPS Systems
-                </Link>
-                <Link to="/components" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Components
-                </Link>
-              </nav>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-                <Input
-                  type="search"
-                  placeholder="Search"
-                  className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
-                />
-              </div>
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
@@ -123,24 +87,26 @@ const Checkout = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="postalCode">Postal Code</Label>
+                    <Label htmlFor="postalCode">PIN Code</Label>
                     <Input
                       id="postalCode"
-                      placeholder="Enter your postal code"
+                      placeholder="Enter PIN code"
                       className="mt-1"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="country">Country</Label>
+                  <Label htmlFor="state">State</Label>
                   <Select>
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select country" />
+                      <SelectValue placeholder="Select state" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
+                      <SelectItem value="maharashtra">Maharashtra</SelectItem>
+                      <SelectItem value="karnataka">Karnataka</SelectItem>
+                      <SelectItem value="delhi">Delhi</SelectItem>
+                      <SelectItem value="gujarat">Gujarat</SelectItem>
+                      <SelectItem value="rajasthan">Rajasthan</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -180,16 +146,20 @@ const Checkout = () => {
                   <RadioGroupItem value="credit-card" id="credit-card" />
                   <Label htmlFor="credit-card" className="flex items-center space-x-2">
                     <CreditCard className="w-4 h-4" />
-                    <span>Credit Card</span>
+                    <span>Credit/Debit Card</span>
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2 p-4 border border-stone-200 rounded-lg">
-                  <RadioGroupItem value="paypal" id="paypal" />
-                  <Label htmlFor="paypal">PayPal</Label>
+                  <RadioGroupItem value="upi" id="upi" />
+                  <Label htmlFor="upi">UPI</Label>
                 </div>
                 <div className="flex items-center space-x-2 p-4 border border-stone-200 rounded-lg">
-                  <RadioGroupItem value="bank-transfer" id="bank-transfer" />
-                  <Label htmlFor="bank-transfer">Bank Transfer</Label>
+                  <RadioGroupItem value="netbanking" id="netbanking" />
+                  <Label htmlFor="netbanking">Net Banking</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-4 border border-stone-200 rounded-lg">
+                  <RadioGroupItem value="cod" id="cod" />
+                  <Label htmlFor="cod">Cash on Delivery</Label>
                 </div>
               </RadioGroup>
 
@@ -231,6 +201,17 @@ const Checkout = () => {
                   </div>
                 </div>
               )}
+
+              {paymentMethod === 'upi' && (
+                <div className="mt-4">
+                  <Label htmlFor="upiId">UPI ID</Label>
+                  <Input
+                    id="upiId"
+                    placeholder="Enter your UPI ID"
+                    className="mt-1"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -241,13 +222,13 @@ const Checkout = () => {
                 <h2 className="text-xl font-bold text-stone-900 mb-6">Order Summary</h2>
                 
                 <div className="space-y-4 mb-6">
-                  {orderItems.map((item, index) => (
+                  {cartItems.map((item, index) => (
                     <div key={index} className="flex justify-between items-start">
                       <div>
                         <h3 className="font-medium text-stone-900">{item.name}</h3>
-                        <p className="text-sm text-stone-600">{item.category}</p>
+                        <p className="text-sm text-stone-600">{item.category} × {item.quantity}</p>
                       </div>
-                      <span className="font-medium text-stone-900">${item.price}</span>
+                      <span className="font-medium text-stone-900">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
                     </div>
                   ))}
                 </div>
@@ -255,20 +236,20 @@ const Checkout = () => {
                 <div className="border-t border-stone-200 pt-4 space-y-2">
                   <div className="flex justify-between text-stone-700">
                     <span>Subtotal</span>
-                    <span>${subtotal.toLocaleString()}</span>
+                    <span>₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between text-stone-700">
                     <span>Shipping</span>
-                    <span>$0</span>
+                    <span>₹0</span>
                   </div>
                   <div className="flex justify-between text-stone-700">
-                    <span>Tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>GST (18%)</span>
+                    <span>₹{Math.round(tax).toLocaleString('en-IN')}</span>
                   </div>
                   <div className="border-t border-stone-200 pt-2">
                     <div className="flex justify-between text-lg font-bold text-stone-900">
                       <span>Total</span>
-                      <span>${(total).toLocaleString()}</span>
+                      <span>₹{Math.round(total).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
