@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Heart } from 'lucide-react';
 import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Products = () => {
   const location = useLocation();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
   const [priceRange, setPriceRange] = useState([500, 200000]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -189,6 +194,32 @@ const Products = () => {
       image: product.image,
       category: product.category
     });
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const handleWishlistToggle = (product) => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast({
+        title: "Removed from Wishlist",
+        description: `${product.name} has been removed from your wishlist.`,
+      });
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category
+      });
+      toast({
+        title: "Added to Wishlist",
+        description: `${product.name} has been added to your wishlist.`,
+      });
+    }
   };
 
   return (
@@ -292,15 +323,27 @@ const Products = () => {
               {products.map((product) => (
                 <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
                   <CardContent className="p-0">
-                    <Link to={`/product/${product.id}`}>
-                      <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    </Link>
+                    <div className="relative">
+                      <Link to={`/product/${product.id}`}>
+                        <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={`absolute top-2 right-2 bg-white/80 hover:bg-white ${
+                          isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
+                        }`}
+                        onClick={() => handleWishlistToggle(product)}
+                      >
+                        <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                      </Button>
+                    </div>
                     <div className="p-4">
                       <Link to={`/product/${product.id}`}>
                         <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors">{product.name}</h3>

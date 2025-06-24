@@ -1,19 +1,25 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Search, Heart, User } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import Header from '@/components/Header';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
 
   const product = {
+    id: 1,
     name: 'UltraBook Pro 15',
     subtitle: '15.6-inch 16GB RAM 512GB SSD Intel Core i7',
-    price: '$1,299',
+    price: 97425,
+    category: 'Laptop',
     images: [
       'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
       'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
@@ -70,57 +76,45 @@ const ProductDetail = () => {
     }
   ];
 
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      category: product.category
+    });
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast({
+        title: "Removed from Wishlist",
+        description: `${product.name} has been removed from your wishlist.`,
+      });
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        category: product.category
+      });
+      toast({
+        title: "Added to Wishlist",
+        description: `${product.name} has been added to your wishlist.`,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-bold text-stone-900">
-                TechGadget
-              </Link>
-              <nav className="hidden md:flex space-x-6">
-                <Link to="/laptops" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Laptops
-                </Link>
-                <Link to="/routers" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Wi-Fi Routers
-                </Link>
-                <Link to="/pcs" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  All-in-One PCs
-                </Link>
-                <Link to="/ups" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  UPS Systems
-                </Link>
-                <Link to="/components" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Components
-                </Link>
-              </nav>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-                <Input
-                  type="search"
-                  placeholder="Search"
-                  className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
-                />
-              </div>
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
@@ -183,14 +177,22 @@ const ProductDetail = () => {
               <span className="text-stone-600">{product.totalReviews} reviews</span>
             </div>
 
-            <div className="text-3xl font-bold text-stone-900">{product.price}</div>
+            <div className="text-3xl font-bold text-stone-900">₹{product.price.toLocaleString('en-IN')}</div>
 
             <div className="flex space-x-4">
-              <Button className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3">
+              <Button 
+                onClick={handleAddToCart}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3"
+              >
                 Add to Cart
               </Button>
-              <Button variant="outline" className="px-6">
-                Add to Wishlist
+              <Button 
+                variant="outline" 
+                className={`px-6 ${isInWishlist(product.id) ? 'text-red-500 border-red-500' : ''}`}
+                onClick={handleWishlistToggle}
+              >
+                <Heart className={`w-4 h-4 mr-2 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                {isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
               </Button>
             </div>
           </div>
