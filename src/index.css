@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -51,6 +52,11 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --sage-50: 84 31% 92%;
+    --sage-100: 84 24% 85%;
+    --sage-200: 84 19% 71%;
+    --sage-300: 84 14% 58%;
   }
 
   .dark {
@@ -100,4 +106,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom sage colors */
+.bg-sage-50 {
+  background-color: hsl(var(--sage-50));
+}
+
+.bg-sage-100 {
+  background-color: hsl(var(--sage-100));
+}
+
+.text-sage-700 {
+  color: hsl(84 14% 40%);
 }
