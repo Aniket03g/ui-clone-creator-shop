@@ -1,138 +1,217 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { ShoppingCart, Search, Heart, User, ChevronDown } from 'lucide-react';
+import Header from '@/components/Header';
+import { useCart } from '@/contexts/CartContext';
 
 const Products = () => {
-  const [priceRange, setPriceRange] = useState([500, 2000]);
-  const [selectedCategory, setSelectedCategory] = useState('All Laptops');
+  const location = useLocation();
+  const { addToCart } = useCart();
+  const [priceRange, setPriceRange] = useState([500, 200000]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const products = [
-    {
-      id: 1,
-      name: 'Tech Haven ProBook 450 G8',
-      price: '$1,299',
-      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop',
-      category: 'Laptop'
-    },
-    {
-      id: 2,
-      name: 'Tech Haven EliteBook 840 G9',
-      price: '$1,599',
-      image: 'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=400&h=300&fit=crop',
-      category: 'Laptop'
-    },
-    {
-      id: 3,
-      name: 'Tech Haven Spectre x360',
-      price: '$1,399',
-      image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&h=300&fit=crop',
-      category: 'Laptop'
-    },
-    {
-      id: 4,
-      name: 'Tech Haven Envy 13',
-      price: '$999',
-      image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&h=300&fit=crop',
-      category: 'Laptop'
-    },
-    {
-      id: 5,
-      name: 'Tech Haven Pavilion 15',
-      price: '$799',
-      image: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=400&h=300&fit=crop',
-      category: 'Laptop'
-    },
-    {
-      id: 6,
-      name: 'Tech Haven Omen 16',
-      price: '$1,799',
-      image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=400&h=300&fit=crop',
-      category: 'Laptop'
+  // Get current category from route
+  const getCurrentCategory = () => {
+    const path = location.pathname;
+    if (path === '/laptops') return 'laptops';
+    if (path === '/routers') return 'routers';
+    if (path === '/pcs') return 'pcs';
+    if (path === '/ups') return 'ups';
+    if (path === '/components') return 'components';
+    return 'store';
+  };
+
+  const currentCategory = getCurrentCategory();
+
+  // All products data
+  const allProducts = {
+    laptops: [
+      {
+        id: 1,
+        name: 'TechBook Pro 15',
+        price: 97425,
+        image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop',
+        category: 'Laptop'
+      },
+      {
+        id: 7,
+        name: 'TechBook Air 13',
+        price: 75325,
+        image: 'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=400&h=300&fit=crop',
+        category: 'Laptop'
+      },
+      {
+        id: 8,
+        name: 'TechBook Gaming X1',
+        price: 134925,
+        image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&h=300&fit=crop',
+        category: 'Laptop'
+      },
+      {
+        id: 9,
+        name: 'TechBook Business Elite',
+        price: 89175,
+        image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&h=300&fit=crop',
+        category: 'Laptop'
+      }
+    ],
+    routers: [
+      {
+        id: 2,
+        name: 'NetLink 6000',
+        price: 11175,
+        image: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router'
+      },
+      {
+        id: 10,
+        name: 'SpeedLink Pro',
+        price: 18675,
+        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router'
+      },
+      {
+        id: 11,
+        name: 'UltraConnect 5G',
+        price: 26175,
+        image: 'https://images.unsplash.com/photo-1544717440-6d6866c37ef7?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router'
+      }
+    ],
+    pcs: [
+      {
+        id: 3,
+        name: 'VisionDesk 27',
+        price: 134925,
+        image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=400&h=300&fit=crop',
+        category: 'All-in-One PC'
+      },
+      {
+        id: 12,
+        name: 'PowerStation 32',
+        price: 186750,
+        image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&h=300&fit=crop',
+        category: 'All-in-One PC'
+      }
+    ],
+    ups: [
+      {
+        id: 4,
+        name: 'PowerGuard 1000',
+        price: 18675,
+        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',
+        category: 'UPS System'
+      },
+      {
+        id: 13,
+        name: 'PowerShield 1500',
+        price: 26175,
+        image: 'https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=300&fit=crop',
+        category: 'UPS System'
+      },
+      {
+        id: 14,
+        name: 'PowerMax 2000',
+        price: 37425,
+        image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
+        category: 'UPS System'
+      }
+    ],
+    components: [
+      {
+        id: 15,
+        name: 'TechRAM 16GB DDR4',
+        price: 7425,
+        image: 'https://images.unsplash.com/photo-1555617778-5b5d3d8d5e6b?w=400&h=300&fit=crop',
+        category: 'Component'
+      },
+      {
+        id: 16,
+        name: 'TechSSD 1TB NVMe',
+        price: 14925,
+        image: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=400&h=300&fit=crop',
+        category: 'Component'
+      }
+    ]
+  };
+
+  // Get products based on current route
+  const getProducts = () => {
+    if (currentCategory === 'store') {
+      return Object.values(allProducts).flat();
     }
-  ];
+    return allProducts[currentCategory] || [];
+  };
 
-  const categories = [
-    'All Laptops',
-    'Gaming Laptops',
-    'Business Laptops',
-    '2-in-1 Laptops',
-    'Chromebooks'
-  ];
+  const products = getProducts();
+
+  // Get category title
+  const getCategoryTitle = () => {
+    switch (currentCategory) {
+      case 'laptops': return 'Laptops';
+      case 'routers': return 'Wi-Fi Routers';
+      case 'pcs': return 'All-in-One PCs';
+      case 'ups': return 'UPS Systems';
+      case 'components': return 'Components';
+      default: return 'All Products';
+    }
+  };
+
+  // Get subcategories based on current category
+  const getSubcategories = () => {
+    switch (currentCategory) {
+      case 'laptops':
+        return ['All Laptops', 'Gaming Laptops', 'Business Laptops', '2-in-1 Laptops', 'Chromebooks'];
+      case 'routers':
+        return ['All Routers', 'Wi-Fi 6 Routers', 'Gaming Routers', 'Mesh Systems'];
+      case 'pcs':
+        return ['All PCs', 'Gaming PCs', 'Business PCs', 'Creative PCs'];
+      case 'ups':
+        return ['All UPS', 'Home UPS', 'Office UPS', 'Server UPS'];
+      case 'components':
+        return ['All Components', 'RAM', 'Storage', 'Graphics Cards', 'Processors'];
+      default:
+        return ['All Categories'];
+    }
+  };
+
+  const subcategories = getSubcategories();
+
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category
+    });
+  };
 
   return (
     <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/" className="text-2xl font-bold text-stone-900">
-                Tech Haven
-              </Link>
-              <nav className="hidden md:flex space-x-6">
-                <Link to="/store" className="text-red-600 font-medium">Store</Link>
-                <Link to="/laptops" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Laptops
-                </Link>
-                <Link to="/routers" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Wi-Fi Routers
-                </Link>
-                <Link to="/pcs" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  All-in-One PCs
-                </Link>
-                <Link to="/ups" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  UPS Systems
-                </Link>
-                <Link to="/components" className="text-stone-700 hover:text-stone-900 transition-colors">
-                  Components
-                </Link>
-              </nav>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-                <Input
-                  type="search"
-                  placeholder="Search"
-                  className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
-                />
-              </div>
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">
+          <Link to="/" className="text-red-600">Home</Link>
+          <span>/</span>
           <Link to="/store" className="text-red-600">Store</Link>
           <span>/</span>
-          <span>Laptops</span>
+          <span>{getCategoryTitle()}</span>
         </div>
 
         <div className="flex gap-8">
           {/* Sidebar Filters */}
           <div className="w-80 space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-stone-900 mb-4">Laptops</h3>
+              <h3 className="text-lg font-semibold text-stone-900 mb-4">{getCategoryTitle()}</h3>
               <div className="space-y-2">
-                {categories.map((category) => (
+                {subcategories.map((category) => (
                   <Button
                     key={category}
                     variant={selectedCategory === category ? "default" : "ghost"}
@@ -161,7 +240,7 @@ const Products = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="any">Any</SelectItem>
-                      <SelectItem value="tech-haven">Tech Haven</SelectItem>
+                      <SelectItem value="techshop">TechShop</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
@@ -173,30 +252,16 @@ const Products = () => {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={3000}
-                      min={200}
-                      step={50}
+                      max={200000}
+                      min={5000}
+                      step={1000}
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-stone-600 mt-2">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
+                      <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
+                      <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-stone-700 mb-2 block">Specifications</label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Any" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Any</SelectItem>
-                      <SelectItem value="intel-i5">Intel i5</SelectItem>
-                      <SelectItem value="intel-i7">Intel i7</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div>
@@ -220,22 +285,33 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-stone-900">Products</h2>
+              <p className="text-stone-600">{products.length} products found</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product) => (
                 <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
                   <CardContent className="p-0">
-                    <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
+                    <Link to={`/product/${product.id}`}>
+                      <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </Link>
                     <div className="p-4">
-                      <h3 className="font-semibold text-stone-900 mb-1">{product.name}</h3>
-                      <p className="text-lg font-bold text-stone-900">{product.price}</p>
+                      <Link to={`/product/${product.id}`}>
+                        <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors">{product.name}</h3>
+                      </Link>
+                      <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
+                      <Button 
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                      >
+                        Add to Cart
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
