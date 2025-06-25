@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,10 +15,11 @@ const Products = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
-  const [priceRange, setPriceRange] = useState([5000, 300000]);
+  const [priceRange, setPriceRange] = useState([300000, 5000]); // High to low
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('any');
   const [selectedRating, setSelectedRating] = useState('any');
+  const [sortBy, setSortBy] = useState('newest');
 
   // Get current category from route
   const getCurrentCategory = () => {
@@ -317,13 +317,13 @@ const Products = () => {
     return allProducts[currentCategory] || [];
   };
 
-  // Apply filters
+  // Apply filters and sorting
   const getFilteredProducts = () => {
     let products = getProducts();
     
-    // Filter by price range
+    // Filter by price range (note: priceRange[0] is max, priceRange[1] is min)
     products = products.filter(product => 
-      product.price >= priceRange[0] && product.price <= priceRange[1]
+      product.price >= priceRange[1] && product.price <= priceRange[0]
     );
     
     // Filter by brand
@@ -336,6 +336,23 @@ const Products = () => {
       products = products.filter(product => product.rating >= 4);
     } else if (selectedRating === '5') {
       products = products.filter(product => product.rating === 5);
+    }
+    
+    // Sort products
+    switch (sortBy) {
+      case 'price-low-high':
+        products.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high-low':
+        products.sort((a, b) => b.price - a.price);
+        break;
+      case 'popularity':
+        products.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'newest':
+      default:
+        // Keep original order for newest
+        break;
     }
     
     return products;
@@ -486,8 +503,8 @@ const Products = () => {
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-stone-600 mt-2">
-                      <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
                       <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
+                      <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
@@ -513,7 +530,23 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-stone-900">Products</h2>
-              <p className="text-stone-600">{filteredProducts.length} products found</p>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-stone-700">Sort by:</label>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest</SelectItem>
+                      <SelectItem value="popularity">Popularity</SelectItem>
+                      <SelectItem value="price-low-high">Price: Low to High</SelectItem>
+                      <SelectItem value="price-high-low">Price: High to Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-stone-600">{filteredProducts.length} products found</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
