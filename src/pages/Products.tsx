@@ -15,7 +15,7 @@ const Products = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
-  const [priceRange, setPriceRange] = useState([300000, 5000]); // High to low
+  const [priceRange, setPriceRange] = useState([5000, 300000]); // Min to Max
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('any');
   const [selectedRating, setSelectedRating] = useState('any');
@@ -321,9 +321,9 @@ const Products = () => {
   const getFilteredProducts = () => {
     let products = getProducts();
     
-    // Filter by price range (note: priceRange[0] is max, priceRange[1] is min)
+    // Filter by price range (priceRange[0] is min, priceRange[1] is max)
     products = products.filter(product => 
-      product.price >= priceRange[1] && product.price <= priceRange[0]
+      product.price >= priceRange[0] && product.price <= priceRange[1]
     );
     
     // Filter by brand
@@ -503,8 +503,8 @@ const Products = () => {
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-stone-600 mt-2">
-                      <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                       <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
+                      <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
@@ -549,60 +549,67 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product, index) => (
-                <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <Link to={`/product/${product.id}`}>
-                        <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`absolute top-2 right-2 bg-white/80 hover:bg-white transform hover:scale-110 transition-all duration-200 ${
-                          isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
-                        }`}
-                        onClick={() => handleWishlistToggle(product)}
-                      >
-                        <Heart className={`w-4 h-4 transition-all duration-200 ${isInWishlist(product.id) ? 'fill-current scale-110' : ''}`} />
-                      </Button>
-                    </div>
-                    <div className="p-4">
-                      <Link to={`/product/${product.id}`}>
-                        <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
-                      </Link>
-                      <div className="flex items-center mb-2">
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`text-sm transition-colors duration-200 ${
-                              i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
-                            }`}
-                          >
-                            ★
-                          </span>
-                        ))}
-                        <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-12 animate-fade-in">
+                <p className="text-stone-600 text-lg">No products found matching your criteria.</p>
+                <p className="text-stone-500 mt-2">Try adjusting your filters to see more results.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product, index) => (
+                  <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                    <CardContent className="p-0">
+                      <div className="relative">
+                        <Link to={`/product/${product.id}`}>
+                          <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`absolute top-2 right-2 bg-white/80 hover:bg-white transform hover:scale-110 transition-all duration-200 ${
+                            isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
+                          }`}
+                          onClick={() => handleWishlistToggle(product)}
+                        >
+                          <Heart className={`w-4 h-4 transition-all duration-200 ${isInWishlist(product.id) ? 'fill-current scale-110' : ''}`} />
+                        </Button>
                       </div>
-                      <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
-                      <Button 
-                        onClick={() => handleAddToCart(product)}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white transform hover:scale-105 transition-all duration-200"
-                      >
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <div className="p-4">
+                        <Link to={`/product/${product.id}`}>
+                          <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
+                        </Link>
+                        <div className="flex items-center mb-2">
+                          {[...Array(5)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-sm transition-colors duration-200 ${
+                                i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                          <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+                        </div>
+                        <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
+                        <Button 
+                          onClick={() => handleAddToCart(product)}
+                          className="w-full bg-red-600 hover:bg-red-700 text-white transform hover:scale-105 transition-all duration-200"
+                        >
+                          Add to Cart
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
