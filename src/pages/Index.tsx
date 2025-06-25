@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
 import Header from '@/components/Header';
+import DealsCarousel from '@/components/DealsCarousel';
 
 const Index = () => {
   const featuredProducts = [
@@ -59,26 +60,33 @@ const Index = () => {
     <div className="min-h-screen bg-stone-50">
       <Header />
 
+      {/* Deals Carousel */}
+      <section className="py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <DealsCarousel />
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-stone-100 to-sage-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-stone-200 to-sage-100 p-12 md:p-16">
-            <div className="absolute right-8 top-8 w-32 h-40 opacity-60">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-stone-200 to-sage-100 p-12 md:p-16 group hover:shadow-2xl transition-all duration-500">
+            <div className="absolute right-8 top-8 w-32 h-40 opacity-60 transform group-hover:scale-110 transition-transform duration-500">
               <img 
                 src="https://images.unsplash.com/photo-1509909756405-be0199881695?w=200&h=300&fit=crop"
                 alt="Plant decoration"
                 className="w-full h-full object-cover rounded-xl"
               />
             </div>
-            <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-6">
+            <div className="max-w-2xl transform group-hover:translate-x-2 transition-transform duration-500">
+              <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-6 animate-fade-in">
                 Upgrade Your Tech Today
               </h1>
-              <p className="text-lg text-stone-700 mb-8">
+              <p className="text-lg text-stone-700 mb-8 animate-fade-in delay-100">
                 Explore our wide range of laptops, routers, and PC components to enhance your digital experience.
               </p>
               <Link to="/store">
-                <Button size="lg" className="bg-stone-800 hover:bg-stone-900 text-white px-8 py-3">
+                <Button size="lg" className="bg-stone-800 hover:bg-stone-900 text-white px-8 py-3 transform hover:scale-105 transition-all duration-200 animate-fade-in delay-200">
                   Shop Now
                 </Button>
               </Link>
@@ -90,25 +98,25 @@ const Index = () => {
       {/* Featured Products */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-stone-900 mb-12">Featured Products</h2>
+          <h2 className="text-3xl font-bold text-stone-900 mb-12 animate-fade-in">Featured Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
+            {featuredProducts.map((product, index) => (
+              <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                 <CardContent className="p-0">
                   <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-stone-900 mb-2">{product.name}</h3>
+                    <h3 className="text-xl font-semibold text-stone-900 mb-2 group-hover:text-red-600 transition-colors duration-200">{product.name}</h3>
                     <p className="text-stone-600 mb-4">{product.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-stone-900">₹{product.price.toLocaleString('en-IN')}</span>
                       <Link to={`/product/${product.id}`}>
-                        <Button variant="outline" className="border-stone-300 hover:bg-stone-50">
+                        <Button variant="outline" className="border-stone-300 hover:bg-stone-50 transform hover:scale-105 transition-all duration-200">
                           View Details
                         </Button>
                       </Link>
@@ -124,23 +132,23 @@ const Index = () => {
       {/* Special Offers */}
       <section className="py-16 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-stone-900 mb-12">Special Offers</h2>
+          <h2 className="text-3xl font-bold text-stone-900 mb-12 animate-fade-in">Special Offers</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {specialOffers.map((offer) => (
-              <Card key={offer.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
+            {specialOffers.map((offer, index) => (
+              <Card key={offer.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 150}ms` }}>
                 <CardContent className="p-0">
                   <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
                     <img
                       src={offer.image}
                       alt={offer.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-stone-900 mb-2">{offer.title}</h3>
+                    <h3 className="text-xl font-semibold text-stone-900 mb-2 group-hover:text-red-600 transition-colors duration-200">{offer.title}</h3>
                     <p className="text-stone-600 mb-4">{offer.description}</p>
                     <Link to="/store">
-                      <Button variant="outline" className="border-stone-300 hover:bg-stone-50">
+                      <Button variant="outline" className="border-stone-300 hover:bg-stone-50 transform hover:scale-105 transition-all duration-200">
                         Shop Now
                       </Button>
                     </Link>
@@ -156,19 +164,19 @@ const Index = () => {
       <footer className="bg-white border-t border-stone-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap justify-center space-x-8 mb-8">
-            <Link to="/about" className="text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/about" className="text-stone-600 hover:text-stone-900 transition-colors hover:scale-105 transform duration-200">
               About Us
             </Link>
-            <Link to="/contact" className="text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/contact" className="text-stone-600 hover:text-stone-900 transition-colors hover:scale-105 transform duration-200">
               Contact
             </Link>
-            <Link to="/support" className="text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/support" className="text-stone-600 hover:text-stone-900 transition-colors hover:scale-105 transform duration-200">
               Support
             </Link>
-            <Link to="/privacy" className="text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/privacy" className="text-stone-600 hover:text-stone-900 transition-colors hover:scale-105 transform duration-200">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-stone-600 hover:text-stone-900 transition-colors">
+            <Link to="/terms" className="text-stone-600 hover:text-stone-900 transition-colors hover:scale-105 transform duration-200">
               Terms of Service
             </Link>
           </div>

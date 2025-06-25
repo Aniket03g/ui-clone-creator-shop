@@ -441,17 +441,17 @@ const Products = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">
-          <Link to="/" className="text-red-600">Home</Link>
+        <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8 animate-fade-in">
+          <Link to="/" className="text-red-600 hover:scale-105 transition-transform duration-200">Home</Link>
           <span>/</span>
-          <Link to="/store" className="text-red-600">Store</Link>
+          <Link to="/store" className="text-red-600 hover:scale-105 transition-transform duration-200">Store</Link>
           <span>/</span>
           <span>{getCategoryTitle()}</span>
         </div>
 
         <div className="flex gap-8">
           {/* Sidebar Filters */}
-          <div className="w-80 space-y-6">
+          <div className="w-80 space-y-6 animate-slide-up">
             <div>
               <h3 className="text-lg font-semibold text-stone-900 mb-4">{getCategoryTitle()}</h3>
               <div className="space-y-2">
@@ -459,7 +459,7 @@ const Products = () => {
                   <Button
                     key={category}
                     variant={selectedCategory === category ? "default" : "ghost"}
-                    className={`w-full justify-start ${
+                    className={`w-full justify-start transform hover:scale-105 transition-all duration-200 ${
                       selectedCategory === category 
                         ? "bg-stone-200 text-stone-900" 
                         : "text-stone-700 hover:bg-stone-100"
@@ -479,7 +479,7 @@ const Products = () => {
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Brand</label>
                   <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full hover:scale-105 transform transition-all duration-200">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
@@ -512,7 +512,7 @@ const Products = () => {
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Customer Ratings</label>
                   <Select value={selectedRating} onValueChange={setSelectedRating}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full hover:scale-105 transform transition-all duration-200">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
@@ -528,13 +528,13 @@ const Products = () => {
 
           {/* Product Grid */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 animate-fade-in delay-100">
               <h2 className="text-2xl font-bold text-stone-900">Products</h2>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium text-stone-700">Sort by:</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-48 hover:scale-105 transform transition-all duration-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -550,8 +550,8 @@ const Products = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
+              {filteredProducts.map((product, index) => (
+                <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                   <CardContent className="p-0">
                     <div className="relative">
                       <Link to={`/product/${product.id}`}>
@@ -559,30 +559,30 @@ const Products = () => {
                           <img
                             src={product.image}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       </Link>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className={`absolute top-2 right-2 bg-white/80 hover:bg-white ${
+                        className={`absolute top-2 right-2 bg-white/80 hover:bg-white transform hover:scale-110 transition-all duration-200 ${
                           isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
                         }`}
                         onClick={() => handleWishlistToggle(product)}
                       >
-                        <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                        <Heart className={`w-4 h-4 transition-all duration-200 ${isInWishlist(product.id) ? 'fill-current scale-110' : ''}`} />
                       </Button>
                     </div>
                     <div className="p-4">
                       <Link to={`/product/${product.id}`}>
-                        <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors">{product.name}</h3>
+                        <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
                       </Link>
                       <div className="flex items-center mb-2">
                         {[...Array(5)].map((_, i) => (
                           <span
                             key={i}
-                            className={`text-sm ${
+                            className={`text-sm transition-colors duration-200 ${
                               i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
                             }`}
                           >
@@ -594,7 +594,7 @@ const Products = () => {
                       <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
                       <Button 
                         onClick={() => handleAddToCart(product)}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white transform hover:scale-105 transition-all duration-200"
                       >
                         Add to Cart
                       </Button>
