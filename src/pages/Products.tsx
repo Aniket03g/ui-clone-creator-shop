@@ -16,8 +16,10 @@ const Products = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
-  const [priceRange, setPriceRange] = useState([500, 200000]);
+  const [priceRange, setPriceRange] = useState([5000, 300000]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedBrand, setSelectedBrand] = useState('any');
+  const [selectedRating, setSelectedRating] = useState('any');
 
   // Get current category from route
   const getCurrentCategory = () => {
@@ -32,7 +34,7 @@ const Products = () => {
 
   const currentCategory = getCurrentCategory();
 
-  // All products data
+  // Extended products data with more items and brands
   const allProducts = {
     laptops: [
       {
@@ -40,28 +42,72 @@ const Products = () => {
         name: 'TechBook Pro 15',
         price: 97425,
         image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop',
-        category: 'Laptop'
+        category: 'Laptop',
+        brand: 'TechShop',
+        rating: 4.5
       },
       {
         id: 7,
         name: 'TechBook Air 13',
         price: 75325,
         image: 'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=400&h=300&fit=crop',
-        category: 'Laptop'
+        category: 'Laptop',
+        brand: 'TechShop',
+        rating: 4.3
       },
       {
         id: 8,
         name: 'TechBook Gaming X1',
         price: 134925,
         image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&h=300&fit=crop',
-        category: 'Laptop'
+        category: 'Laptop',
+        brand: 'TechShop',
+        rating: 4.7
       },
       {
         id: 9,
         name: 'TechBook Business Elite',
         price: 89175,
         image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&h=300&fit=crop',
-        category: 'Laptop'
+        category: 'Laptop',
+        brand: 'TechShop',
+        rating: 4.4
+      },
+      {
+        id: 17,
+        name: 'Dell Inspiron 15',
+        price: 65000,
+        image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=400&h=300&fit=crop',
+        category: 'Laptop',
+        brand: 'Dell',
+        rating: 4.2
+      },
+      {
+        id: 18,
+        name: 'HP Pavilion 14',
+        price: 55000,
+        image: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=400&h=300&fit=crop',
+        category: 'Laptop',
+        brand: 'HP',
+        rating: 4.1
+      },
+      {
+        id: 19,
+        name: 'Lenovo ThinkPad E14',
+        price: 78000,
+        image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=400&h=300&fit=crop',
+        category: 'Laptop',
+        brand: 'Lenovo',
+        rating: 4.6
+      },
+      {
+        id: 20,
+        name: 'ASUS VivoBook 15',
+        price: 52000,
+        image: 'https://images.unsplash.com/photo-1515343476470-163c97a3c1a3?w=400&h=300&fit=crop',
+        category: 'Laptop',
+        brand: 'ASUS',
+        rating: 4.0
       }
     ],
     routers: [
@@ -70,21 +116,54 @@ const Products = () => {
         name: 'NetLink 6000',
         price: 11175,
         image: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=400&h=300&fit=crop',
-        category: 'Wi-Fi Router'
+        category: 'Wi-Fi Router',
+        brand: 'TechShop',
+        rating: 4.4
       },
       {
         id: 10,
         name: 'SpeedLink Pro',
         price: 18675,
         image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-        category: 'Wi-Fi Router'
+        category: 'Wi-Fi Router',
+        brand: 'TechShop',
+        rating: 4.5
       },
       {
         id: 11,
         name: 'UltraConnect 5G',
         price: 26175,
         image: 'https://images.unsplash.com/photo-1544717440-6d6866c37ef7?w=400&h=300&fit=crop',
-        category: 'Wi-Fi Router'
+        category: 'Wi-Fi Router',
+        brand: 'TechShop',
+        rating: 4.7
+      },
+      {
+        id: 21,
+        name: 'TP-Link Archer AX73',
+        price: 15000,
+        image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router',
+        brand: 'TP-Link',
+        rating: 4.3
+      },
+      {
+        id: 22,
+        name: 'Netgear Nighthawk AX12',
+        price: 35000,
+        image: 'https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router',
+        brand: 'Netgear',
+        rating: 4.8
+      },
+      {
+        id: 23,
+        name: 'D-Link DIR-X1560',
+        price: 8500,
+        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',
+        category: 'Wi-Fi Router',
+        brand: 'D-Link',
+        rating: 4.1
       }
     ],
     pcs: [
@@ -93,14 +172,36 @@ const Products = () => {
         name: 'VisionDesk 27',
         price: 134925,
         image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=400&h=300&fit=crop',
-        category: 'All-in-One PC'
+        category: 'All-in-One PC',
+        brand: 'TechShop',
+        rating: 4.6
       },
       {
         id: 12,
         name: 'PowerStation 32',
         price: 186750,
         image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&h=300&fit=crop',
-        category: 'All-in-One PC'
+        category: 'All-in-One PC',
+        brand: 'TechShop',
+        rating: 4.8
+      },
+      {
+        id: 24,
+        name: 'HP All-in-One 24',
+        price: 95000,
+        image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop',
+        category: 'All-in-One PC',
+        brand: 'HP',
+        rating: 4.3
+      },
+      {
+        id: 25,
+        name: 'Dell Inspiron 27 AIO',
+        price: 120000,
+        image: 'https://images.unsplash.com/photo-1572459443203-55bf9c14e87d?w=400&h=300&fit=crop',
+        category: 'All-in-One PC',
+        brand: 'Dell',
+        rating: 4.5
       }
     ],
     ups: [
@@ -109,21 +210,45 @@ const Products = () => {
         name: 'PowerGuard 1000',
         price: 18675,
         image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',
-        category: 'UPS System'
+        category: 'UPS System',
+        brand: 'TechShop',
+        rating: 4.4
       },
       {
         id: 13,
         name: 'PowerShield 1500',
         price: 26175,
         image: 'https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=300&fit=crop',
-        category: 'UPS System'
+        category: 'UPS System',
+        brand: 'TechShop',
+        rating: 4.5
       },
       {
         id: 14,
         name: 'PowerMax 2000',
         price: 37425,
         image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
-        category: 'UPS System'
+        category: 'UPS System',
+        brand: 'TechShop',
+        rating: 4.7
+      },
+      {
+        id: 26,
+        name: 'APC Back-UPS 1100',
+        price: 22000,
+        image: 'https://images.unsplash.com/photo-1509909756405-be0199881695?w=400&h=300&fit=crop',
+        category: 'UPS System',
+        brand: 'APC',
+        rating: 4.6
+      },
+      {
+        id: 27,
+        name: 'Microtek UPS EB 800',
+        price: 12000,
+        image: 'https://images.unsplash.com/photo-1572459443203-55bf9c14e87d?w=400&h=300&fit=crop',
+        category: 'UPS System',
+        brand: 'Microtek',
+        rating: 4.2
       }
     ],
     components: [
@@ -132,14 +257,54 @@ const Products = () => {
         name: 'TechRAM 16GB DDR4',
         price: 7425,
         image: 'https://images.unsplash.com/photo-1555617778-5b5d3d8d5e6b?w=400&h=300&fit=crop',
-        category: 'Component'
+        category: 'Component',
+        brand: 'TechShop',
+        rating: 4.3
       },
       {
         id: 16,
         name: 'TechSSD 1TB NVMe',
         price: 14925,
         image: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=400&h=300&fit=crop',
-        category: 'Component'
+        category: 'Component',
+        brand: 'TechShop',
+        rating: 4.5
+      },
+      {
+        id: 28,
+        name: 'Corsair Vengeance 32GB',
+        price: 18000,
+        image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&h=300&fit=crop',
+        category: 'Component',
+        brand: 'Corsair',
+        rating: 4.7
+      },
+      {
+        id: 29,
+        name: 'Samsung 980 PRO 2TB',
+        price: 28000,
+        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
+        category: 'Component',
+        brand: 'Samsung',
+        rating: 4.8
+      },
+      {
+        id: 30,
+        name: 'NVIDIA RTX 4060',
+        price: 85000,
+        image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=300&fit=crop',
+        category: 'Component',
+        brand: 'NVIDIA',
+        rating: 4.9
+      },
+      {
+        id: 31,
+        name: 'AMD Ryzen 7 5800X',
+        price: 32000,
+        image: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=400&h=300&fit=crop',
+        category: 'Component',
+        brand: 'AMD',
+        rating: 4.6
       }
     ]
   };
@@ -152,7 +317,38 @@ const Products = () => {
     return allProducts[currentCategory] || [];
   };
 
-  const products = getProducts();
+  // Apply filters
+  const getFilteredProducts = () => {
+    let products = getProducts();
+    
+    // Filter by price range
+    products = products.filter(product => 
+      product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+    
+    // Filter by brand
+    if (selectedBrand !== 'any') {
+      products = products.filter(product => product.brand === selectedBrand);
+    }
+    
+    // Filter by rating
+    if (selectedRating === '4-plus') {
+      products = products.filter(product => product.rating >= 4);
+    } else if (selectedRating === '5') {
+      products = products.filter(product => product.rating === 5);
+    }
+    
+    return products;
+  };
+
+  const filteredProducts = getFilteredProducts();
+
+  // Get unique brands from current products
+  const getAvailableBrands = () => {
+    const products = getProducts();
+    const brands = [...new Set(products.map(product => product.brand))];
+    return brands.sort();
+  };
 
   // Get category title
   const getCategoryTitle = () => {
@@ -265,14 +461,15 @@ const Products = () => {
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Brand</label>
-                  <Select>
+                  <Select value={selectedBrand} onValueChange={setSelectedBrand}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="any">Any</SelectItem>
-                      <SelectItem value="techshop">TechShop</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      {getAvailableBrands().map((brand) => (
+                        <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -283,7 +480,7 @@ const Products = () => {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={200000}
+                      max={300000}
                       min={5000}
                       step={1000}
                       className="w-full"
@@ -297,7 +494,7 @@ const Products = () => {
 
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Customer Ratings</label>
-                  <Select>
+                  <Select value={selectedRating} onValueChange={setSelectedRating}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
@@ -316,11 +513,11 @@ const Products = () => {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-stone-900">Products</h2>
-              <p className="text-stone-600">{products.length} products found</p>
+              <p className="text-stone-600">{filteredProducts.length} products found</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 border-stone-200">
                   <CardContent className="p-0">
                     <div className="relative">
@@ -348,6 +545,19 @@ const Products = () => {
                       <Link to={`/product/${product.id}`}>
                         <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors">{product.name}</h3>
                       </Link>
+                      <div className="flex items-center mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={`text-sm ${
+                              i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
+                            }`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                        <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+                      </div>
                       <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
                       <Button 
                         onClick={() => handleAddToCart(product)}

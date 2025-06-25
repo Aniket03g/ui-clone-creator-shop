@@ -51,14 +51,16 @@ const Header = () => {
                 className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
               />
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="w-5 h-5" />
-              {totalWishlistItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalWishlistItems}
-                </span>
-              )}
-            </Button>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="relative">
+                <Heart className="w-5 h-5" />
+                {totalWishlistItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalWishlistItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="w-5 h-5" />
