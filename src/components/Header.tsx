@@ -2,28 +2,35 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ShoppingCart, Search, Heart, User } from 'lucide-react';
+import { ShoppingCart, Heart, User, LogOut, Settings } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useUser } from '@/contexts/UserContext';
+import SearchDropdown from './SearchDropdown';
+import AuthDialog from './AuthDialog';
 
 const Header = () => {
   const { getTotalItems } = useCart();
   const { getTotalWishlistItems } = useWishlist();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { user, logout, isAuthenticated } = useUser();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const navigate = useNavigate();
+  
   const totalItems = getTotalItems();
   const totalWishlistItems = getTotalWishlistItems();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  const handleUserMenuClick = () => {
+    if (isAuthenticated) {
+      navigate('/profile');
+    } else {
+      setShowAuthDialog(true);
     }
   };
 
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -57,16 +64,8 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={handleSearchInputChange}
-                className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
-              />
-            </form>
+            <SearchDropdown />
+            
             <Link to="/wishlist">
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="w-5 h-5" />
@@ -77,6 +76,7 @@ const Header = () => {
                 )}
               </Button>
             </Link>
+            
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="w-5 h-5" />
@@ -87,12 +87,40 @@ const Header = () => {
                 )}
               </Button>
             </Link>
-            <Button variant="ghost" size="icon">
-              <User className="w-5 h-5" />
-            </Button>
+
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    Hello, {user?.firstName || 'User'}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    My Account
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="icon" onClick={handleUserMenuClick}>
+                <User className="w-5 h-5" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
+
+      <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
     </header>
   );
 };
