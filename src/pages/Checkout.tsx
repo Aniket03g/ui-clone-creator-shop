@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,15 +7,33 @@ import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import CheckoutSteps from '@/components/checkout/CheckoutSteps';
-import ReviewOrderStep from '@/components/checkout/ReviewOrderStep';
 import AddressStep from '@/components/checkout/AddressStep';
 import PaymentStep from '@/components/checkout/PaymentStep';
 import DeliveryStep from '@/components/checkout/DeliveryStep';
 import OrderSummaryStep from '@/components/checkout/OrderSummaryStep';
 
+export interface CheckoutData {
+  address: {
+    fullName: string;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    phone: string;
+  } | null;
+  paymentMethod: string;
+  deliveryOption: string;
+}
+
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [checkoutData, setCheckoutData] = useState<CheckoutData>({
+    address: null,
+    paymentMethod: '',
+    deliveryOption: ''
+  });
+  
   const { cartItems, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -83,42 +102,45 @@ const Checkout = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {currentStep === 1 && (
-              <ReviewOrderStep 
-                cartItems={cartItems}
-                onNext={() => goToStep(2)}
+              <AddressStep 
+                onNext={(addressData) => {
+                  setCheckoutData(prev => ({ ...prev, address: addressData }));
+                  goToStep(2);
+                }}
+                onBack={() => navigate('/cart')}
               />
             )}
             
             {currentStep === 2 && (
-              <AddressStep 
-                onNext={() => goToStep(3)}
+              <PaymentStep 
+                onNext={(paymentMethod) => {
+                  setCheckoutData(prev => ({ ...prev, paymentMethod }));
+                  goToStep(3);
+                }}
                 onBack={() => setCurrentStep(1)}
               />
             )}
             
             {currentStep === 3 && (
-              <PaymentStep 
-                onNext={() => goToStep(4)}
+              <DeliveryStep 
+                onNext={(deliveryOption) => {
+                  setCheckoutData(prev => ({ ...prev, deliveryOption }));
+                  goToStep(4);
+                }}
                 onBack={() => setCurrentStep(2)}
               />
             )}
             
             {currentStep === 4 && (
-              <DeliveryStep 
-                onNext={() => goToStep(5)}
-                onBack={() => setCurrentStep(3)}
-              />
-            )}
-            
-            {currentStep === 5 && (
               <OrderSummaryStep 
                 cartItems={cartItems}
                 subtotal={subtotal}
                 tax={tax}
                 deliveryFee={deliveryFee}
                 total={total}
+                checkoutData={checkoutData}
                 onPlaceOrder={handlePlaceOrder}
-                onBack={() => setCurrentStep(4)}
+                onBack={() => setCurrentStep(3)}
               />
             )}
           </div>

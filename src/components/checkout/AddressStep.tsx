@@ -10,7 +10,7 @@ import { useUser } from '@/contexts/UserContext';
 import { MapPin, Plus } from 'lucide-react';
 
 interface AddressStepProps {
-  onNext: () => void;
+  onNext: (address: any) => void;
   onBack: () => void;
 }
 
@@ -30,7 +30,22 @@ const AddressStep: React.FC<AddressStepProps> = ({ onNext, onBack }) => {
   const handleNext = () => {
     if (!useNewAddress && !selectedAddress) return;
     if (useNewAddress && (!newAddress.fullName || !newAddress.street || !newAddress.city)) return;
-    onNext();
+    
+    if (useNewAddress) {
+      onNext(newAddress);
+    } else {
+      const selectedAddr = user?.addresses.find(addr => addr.id === selectedAddress);
+      if (selectedAddr) {
+        onNext({
+          fullName: `${user.firstName} ${user.lastName}`,
+          street: selectedAddr.street,
+          city: selectedAddr.city,
+          state: selectedAddr.state,
+          zipCode: selectedAddr.zipCode,
+          phone: user.phone
+        });
+      }
+    }
   };
 
   return (
@@ -161,7 +176,7 @@ const AddressStep: React.FC<AddressStepProps> = ({ onNext, onBack }) => {
 
         <div className="flex gap-4 pt-4 border-t border-stone-200">
           <Button variant="outline" onClick={onBack} className="flex-1">
-            Back to Review
+            Back to Cart
           </Button>
           <Button 
             onClick={handleNext} 

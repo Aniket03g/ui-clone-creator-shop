@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CreditCard, Smartphone, Building, Banknote } from 'lucide-react';
 
 interface PaymentStepProps {
-  onNext: () => void;
+  onNext: (paymentMethod: string) => void;
   onBack: () => void;
 }
 
@@ -27,7 +27,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ onNext, onBack }) => {
       if (!cardDetails.cardNumber || !cardDetails.expiry || !cardDetails.cvv || !cardDetails.cardName) return;
     }
     if (paymentMethod === 'upi' && !upiId) return;
-    onNext();
+    onNext(paymentMethod);
   };
 
   return (

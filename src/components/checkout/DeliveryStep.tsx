@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Truck, Clock, Zap } from 'lucide-react';
 
 interface DeliveryStepProps {
-  onNext: () => void;
+  onNext: (deliveryOption: string) => void;
   onBack: () => void;
 }
 
@@ -37,6 +37,10 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onNext, onBack }) => {
       icon: <Zap className="w-5 h-5" />
     }
   ];
+
+  const handleNext = () => {
+    onNext(deliveryOption);
+  };
 
   return (
     <Card>
@@ -83,7 +87,7 @@ const DeliveryStep: React.FC<DeliveryStepProps> = ({ onNext, onBack }) => {
             Back to Payment
           </Button>
           <Button 
-            onClick={onNext} 
+            onClick={handleNext} 
             className="flex-1 bg-red-600 hover:bg-red-700 text-white"
           >
             Review Order

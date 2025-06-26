@@ -8,11 +8,10 @@ interface CheckoutStepsProps {
 }
 
 const steps = [
-  { id: 1, name: 'Review Order', description: 'Check your items' },
-  { id: 2, name: 'Address', description: 'Shipping information' },
-  { id: 3, name: 'Payment', description: 'Payment method' },
-  { id: 4, name: 'Delivery', description: 'Delivery options' },
-  { id: 5, name: 'Summary', description: 'Final review' }
+  { id: 1, name: 'Address', description: 'Shipping information' },
+  { id: 2, name: 'Payment', description: 'Payment method' },
+  { id: 3, name: 'Delivery', description: 'Delivery options' },
+  { id: 4, name: 'Summary', description: 'Final review' }
 ];
 
 const CheckoutSteps: React.FC<CheckoutStepsProps> = ({ currentStep, completedSteps }) => {
