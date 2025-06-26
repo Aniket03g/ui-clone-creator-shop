@@ -1,5 +1,6 @@
 
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ShoppingCart, Search, Heart, User } from 'lucide-react';
@@ -9,8 +10,21 @@ import { useWishlist } from '@/contexts/WishlistContext';
 const Header = () => {
   const { getTotalItems } = useCart();
   const { getTotalWishlistItems } = useWishlist();
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
   const totalItems = getTotalItems();
   const totalWishlistItems = getTotalWishlistItems();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
@@ -43,14 +57,16 @@ const Header = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
               <Input
                 type="search"
-                placeholder="Search"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={handleSearchInputChange}
                 className="pl-10 w-64 bg-stone-100 border-0 focus:bg-white transition-colors"
               />
-            </div>
+            </form>
             <Link to="/wishlist">
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="w-5 h-5" />
