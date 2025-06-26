@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,10 +19,10 @@ const Checkout = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const subtotal = getTotalPrice();
-  const deliveryFee = 0; // This would be calculated based on delivery option
-  const tax = subtotal * 0.18; // 18% GST for India
-  const total = subtotal + tax + deliveryFee;
+  const subtotal: number = getTotalPrice();
+  const deliveryFee: number = 0; // This would be calculated based on delivery option
+  const tax: number = subtotal * 0.18; // 18% GST for India
+  const total: number = subtotal + tax + deliveryFee;
 
   const handleStepComplete = (step: number) => {
     if (!completedSteps.includes(step)) {
