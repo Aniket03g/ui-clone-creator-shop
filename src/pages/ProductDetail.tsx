@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -125,8 +126,8 @@ const ProductDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Product Images */}
-          <div className="space-y-4">
+          {/* Product Images - Sticky Container */}
+          <div className="lg:sticky lg:top-8 lg:self-start space-y-4">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100">
               <img
                 src={product.images[selectedImage]}
@@ -153,7 +154,7 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Product Info */}
+          {/* Product Info - Scrollable Content */}
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-stone-900 mb-2">{product.name}</h1>
@@ -195,24 +196,24 @@ const ProductDetail = () => {
                 {isInWishlist(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
               </Button>
             </div>
-          </div>
-        </div>
 
-        {/* Specifications */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-stone-900 mb-6">Specifications</h2>
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(product.specifications).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b border-stone-200 last:border-b-0">
-                    <span className="font-medium text-stone-900">{key}</span>
-                    <span className="text-stone-600">{value}</span>
+            {/* Specifications - Part of scrollable content */}
+            <div className="pt-8">
+              <h2 className="text-2xl font-bold text-stone-900 mb-6">Specifications</h2>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-2 border-b border-stone-200 last:border-b-0">
+                        <span className="font-medium text-stone-900">{key}</span>
+                        <span className="text-stone-600">{value}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
 
         {/* Customer Reviews */}
