@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,7 @@ const ProductDetail = () => {
   const { toast } = useToast();
 
   // Sample products data - in a real app this would come from an API
-  const products = {
+  const products: Record<string, any> = {
     1: {
       id: 1,
       name: 'UltraBook Pro 15',
@@ -158,7 +157,7 @@ const ProductDetail = () => {
     }
   };
 
-  const product = products[parseInt(id) || 1] || products[1];
+  const product = products[id || '1'] || products['1'];
 
   const relatedProducts = [
     {
@@ -257,7 +256,7 @@ const ProductDetail = () => {
               />
             </div>
             <div className="flex space-x-4">
-              {product.images.map((image, index) => (
+              {product.images.map((image: string, index: number) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -324,7 +323,7 @@ const ProductDetail = () => {
               <Card>
                 <CardContent className="p-6">
                   <ul className="space-y-3">
-                    {product.aboutItem.map((item, index) => (
+                    {product.aboutItem.map((item: string, index: number) => (
                       <li key={index} className="flex items-start">
                         <span className="w-2 h-2 bg-stone-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
                         <span className="text-stone-700">{item}</span>
@@ -344,7 +343,7 @@ const ProductDetail = () => {
                     {Object.entries(product.specifications).map(([key, value]) => (
                       <div key={key} className="flex justify-between py-3 border-b border-stone-100 last:border-b-0">
                         <span className="font-medium text-stone-900">{key}</span>
-                        <span className="text-stone-600 text-right ml-4">{value}</span>
+                        <span className="text-stone-600 text-right ml-4">{String(value)}</span>
                       </div>
                     ))}
                   </div>
