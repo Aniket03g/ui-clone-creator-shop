@@ -17,6 +17,7 @@ const ProductDetail = () => {
 
   // Sample products data - in a real app this would come from an API
   const products: Record<string, any> = {
+    // Laptops
     1: {
       id: 1,
       name: 'UltraBook Pro 15',
@@ -154,6 +155,341 @@ const ProductDetail = () => {
       },
       rating: 4.3,
       totalReviews: 156
+    },
+    // Routers
+    4: {
+      id: 4,
+      name: 'WiFi Pro Max 6E',
+      subtitle: 'AX6600 Tri-Band Wi-Fi 6E Router with 8 Antennas',
+      price: 15999,
+      category: 'Router',
+      images: [
+        'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Next-generation Wi-Fi 6E technology for ultra-fast wireless speeds',
+        'Tri-band connectivity with dedicated 6GHz band for less congestion',
+        'AX6600 combined speeds up to 6.6 Gbps for seamless streaming',
+        '8 high-gain antennas with beamforming for extended coverage',
+        'Advanced security with WPA3 encryption and automatic updates',
+        'Easy setup with mobile app and voice control compatibility',
+        'Supports 200+ connected devices simultaneously',
+        'Gaming accelerator and QoS prioritization for lag-free experience'
+      ],
+      specifications: {
+        'Wi-Fi Standard': 'Wi-Fi 6E (802.11ax)',
+        'Max Speed': '6600 Mbps (AX6600)',
+        'Frequency Bands': 'Tri-band (2.4GHz, 5GHz, 6GHz)',
+        'Antennas': '8x High-gain external antennas',
+        'Ethernet Ports': '4x Gigabit LAN, 1x Gigabit WAN',
+        'USB Ports': '1x USB 3.0, 1x USB 2.0',
+        'Processor': 'Quad-core 1.8GHz ARM Cortex-A53',
+        'Memory': '1GB RAM, 256MB Flash',
+        'Security': 'WPA3, WPA2, VPN support',
+        'Coverage': 'Up to 3000 sq ft',
+        'Device Capacity': '200+ devices',
+        'Power': '12V/4A adapter',
+        'Dimensions': '300 x 200 x 60 mm',
+        'Weight': '1.2 kg',
+        'Operating Temperature': '0°C to 40°C',
+        'Warranty': '3 year limited warranty'
+      },
+      rating: 4.6,
+      totalReviews: 234
+    },
+    5: {
+      id: 5,
+      name: 'Mesh Pro System',
+      subtitle: '3-Pack AX3000 Whole Home Mesh Wi-Fi System',
+      price: 25999,
+      category: 'Router',
+      images: [
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Whole home mesh system eliminates dead zones and weak signals',
+        'AX3000 dual-band Wi-Fi 6 for consistent high-speed connectivity',
+        'Seamless roaming between nodes without connection drops',
+        'Easy setup and management through mobile app',
+        'Advanced parental controls and guest network features',
+        'Automatic band steering and load balancing optimization',
+        'Works with existing modem and internet service provider',
+        'Expandable system - add more nodes as needed'
+      ],
+      specifications: {
+        'Wi-Fi Standard': 'Wi-Fi 6 (802.11ax)',
+        'Max Speed': '3000 Mbps (AX3000)',
+        'Frequency Bands': 'Dual-band (2.4GHz, 5GHz)',
+        'Coverage': 'Up to 6000 sq ft (3-pack)',
+        'Nodes Included': '3x Mesh nodes',
+        'Ethernet Ports': '2x Gigabit per node',
+        'Processor': 'Dual-core 1.2GHz',
+        'Memory': '512MB RAM, 128MB Flash',
+        'Security': 'WPA3, automatic security updates',
+        'Device Capacity': '150+ devices',
+        'Setup': 'App-based setup and management',
+        'Power': 'Power adapter per node',
+        'Dimensions': '110 x 110 x 75 mm per node',
+        'Weight': '0.4 kg per node',
+        'Compatibility': 'Works with all ISPs',
+        'Warranty': '2 year limited warranty'
+      },
+      rating: 4.4,
+      totalReviews: 189
+    },
+    // Desktop PCs
+    6: {
+      id: 6,
+      name: 'Workstation Pro Tower',
+      subtitle: 'Intel i9-13900K 32GB RAM RTX 4070 1TB NVMe',
+      price: 185000,
+      category: 'Desktop PC',
+      images: [
+        'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'High-performance workstation for professional content creation',
+        'Latest Intel Core i9-13900K processor with 24 cores',
+        'NVIDIA RTX 4070 graphics card for 4K rendering and gaming',
+        '32GB DDR5 RAM for handling complex multitasking workflows',
+        '1TB NVMe SSD for ultra-fast file access and boot times',
+        'Premium cooling system with liquid CPU cooler',
+        'Tool-free upgrades with spacious mid-tower design',
+        'Pre-installed Windows 11 Pro with productivity software'
+      ],
+      specifications: {
+        'Processor': 'Intel Core i9-13900K',
+        'Cores/Threads': '24 cores / 32 threads',
+        'Base Clock': '3.0 GHz',
+        'Boost Clock': 'Up to 5.8 GHz',
+        'RAM': '32GB DDR5-5600',
+        'Storage': '1TB NVMe PCIe 4.0 SSD',
+        'Graphics': 'NVIDIA GeForce RTX 4070 12GB',
+        'Motherboard': 'Intel Z790 chipset',
+        'Power Supply': '750W 80+ Gold certified',
+        'Cooling': 'Liquid CPU cooler + case fans',
+        'Case': 'Mid-tower with tempered glass',
+        'Operating System': 'Windows 11 Pro',
+        'Connectivity': 'Wi-Fi 6E, Bluetooth 5.3',
+        'Ports': 'USB-C, USB 3.2, HDMI, DisplayPort',
+        'Warranty': '3 year parts and labor'
+      },
+      rating: 4.8,
+      totalReviews: 67
+    },
+    7: {
+      id: 7,
+      name: 'Gaming Rig Ultimate',
+      subtitle: 'AMD Ryzen 9 7900X 64GB RAM RTX 4080 2TB NVMe',
+      price: 245000,
+      category: 'Desktop PC',
+      images: [
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Ultimate gaming performance with flagship AMD Ryzen processor',
+        'NVIDIA RTX 4080 graphics for 4K gaming at maximum settings',
+        'Massive 64GB DDR5 RAM for future-proof gaming and streaming',
+        '2TB NVMe SSD storage for extensive game library',
+        'Custom RGB lighting with synchronized effects',
+        'Advanced liquid cooling for optimal thermal performance',
+        'High-refresh rate gaming support up to 240Hz',
+        'VR-ready with premium connectivity options'
+      ],
+      specifications: {
+        'Processor': 'AMD Ryzen 9 7900X',
+        'Cores/Threads': '12 cores / 24 threads',
+        'Base Clock': '4.7 GHz',
+        'Boost Clock': 'Up to 5.6 GHz',
+        'RAM': '64GB DDR5-6000',
+        'Storage': '2TB NVMe PCIe 4.0 SSD',
+        'Graphics': 'NVIDIA GeForce RTX 4080 16GB',
+        'Motherboard': 'AMD X670E chipset',
+        'Power Supply': '850W 80+ Platinum modular',
+        'Cooling': 'Custom liquid cooling loop',
+        'Case': 'Full-tower with RGB lighting',
+        'Operating System': 'Windows 11 Home',
+        'Connectivity': 'Wi-Fi 6E, Bluetooth 5.3',
+        'Ports': 'Multiple USB-C, USB 3.2, HDMI 2.1',
+        'Warranty': '3 year comprehensive warranty'
+      },
+      rating: 4.9,
+      totalReviews: 43
+    },
+    // UPS Systems
+    8: {
+      id: 8,
+      name: 'PowerGuard Pro 1500VA',
+      subtitle: 'Line Interactive UPS with LCD Display',
+      price: 12500,
+      category: 'UPS',
+      images: [
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Reliable power protection for home and small office equipment',
+        '1500VA/900W capacity supports multiple devices simultaneously',
+        'Line interactive technology with automatic voltage regulation',
+        'LCD display shows real-time power status and battery information',
+        'Multiple outlets with surge protection and battery backup',
+        'USB connectivity for automatic shutdown software',
+        'Replaceable battery design for long-term cost savings',
+        'Energy efficient operation with low power consumption'
+      ],
+      specifications: {
+        'Capacity': '1500VA / 900W',
+        'Technology': 'Line Interactive',
+        'Input Voltage': '140V - 300V AC',
+        'Output Voltage': '220V ± 10%',
+        'Battery': '12V 9Ah x 2',
+        'Backup Time': '10-25 minutes (typical load)',
+        'Outlets': '8x outlets (4 with battery backup)',
+        'Display': 'LCD with status indicators',
+        'Connectivity': 'USB port for monitoring',
+        'Transfer Time': '2-4 milliseconds',
+        'Surge Protection': 'Yes, built-in',
+        'Dimensions': '365 x 180 x 210 mm',
+        'Weight': '11.5 kg',
+        'Operating Temperature': '0°C to 40°C',
+        'Warranty': '2 year product, 1 year battery'
+      },
+      rating: 4.3,
+      totalReviews: 156
+    },
+    9: {
+      id: 9,
+      name: 'Enterprise UPS 3000VA',
+      subtitle: 'Online Double Conversion UPS System',
+      price: 35000,
+      category: 'UPS',
+      images: [
+        'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Premium online double conversion technology for critical applications',
+        '3000VA/2700W capacity for servers and network equipment',
+        'Zero transfer time with continuous power conditioning',
+        'Hot-swappable batteries for maintenance without downtime',
+        'Network management card for remote monitoring and control',
+        'Automatic bypass for overload and internal fault protection',
+        'Extended runtime with external battery cabinet option',
+        'Enterprise-grade reliability with advanced diagnostics'
+      ],
+      specifications: {
+        'Capacity': '3000VA / 2700W',
+        'Technology': 'Online Double Conversion',
+        'Input Voltage': '120V-300V AC (wide range)',
+        'Output Voltage': '220V ± 1%',
+        'Efficiency': '95% (ECO mode)',
+        'Battery': 'Hot-swappable modules',
+        'Runtime': '5-15 minutes at full load',
+        'Display': 'Color LCD touchscreen',
+        'Communication': 'SNMP, USB, RS-232',
+        'Outlets': '6x IEC outlets',
+        'Transfer Time': '0ms (online)',
+        'Input Power Factor': '0.99',
+        'Dimensions': '440 x 665 x 88 mm (2U)',
+        'Weight': '28 kg',
+        'Operating Temp': '0°C to 40°C',
+        'Warranty': '3 year advanced replacement'
+      },
+      rating: 4.7,
+      totalReviews: 89
+    },
+    // Components
+    10: {
+      id: 10,
+      name: 'RGB Gaming Memory Kit',
+      subtitle: '32GB (2x16GB) DDR5-6000 RGB RAM',
+      price: 18500,
+      category: 'Component',
+      images: [
+        'https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'High-performance DDR5 memory for gaming and content creation',
+        'RGB lighting with customizable effects and software control',
+        '6000MHz speed with low latency timings for maximum performance',
+        'Intel XMP 3.0 and AMD EXPO certified for easy overclocking',
+        'Premium aluminum heat spreaders for optimal thermal management',
+        'Lifetime warranty with dedicated technical support',
+        'Compatible with latest Intel and AMD platforms',
+        'Tested and validated for stability and reliability'
+      ],
+      specifications: {
+        'Memory Type': 'DDR5 SDRAM',
+        'Capacity': '32GB (2 x 16GB)',
+        'Speed': 'DDR5-6000',
+        'Latency': 'CL30-36-36-76',
+        'Voltage': '1.35V',
+        'RGB Lighting': 'Addressable RGB LEDs',
+        'Heat Spreader': 'Aluminum with thermal pads',
+        'Form Factor': '288-pin DIMM',
+        'Compatibility': 'Intel XMP 3.0, AMD EXPO',
+        'Operating Temp': '0°C to 85°C',
+        'Dimensions': '133.35 x 34.9 x 6.62 mm',
+        'Weight': '45g per module',
+        'Software': 'RGB control software included',
+        'Warranty': 'Lifetime limited warranty',
+        'Certification': 'JEDEC compliant'
+      },
+      rating: 4.6,
+      totalReviews: 312
+    },
+    11: {
+      id: 11,
+      name: 'NVMe SSD Pro 2TB',
+      subtitle: 'PCIe 4.0 M.2 SSD with Heat Sink',
+      price: 22000,
+      category: 'Component',
+      images: [
+        'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Ultra-fast PCIe 4.0 NVMe SSD for maximum storage performance',
+        '2TB capacity for large game libraries and professional workloads',
+        'Sequential read speeds up to 7,400 MB/s for instant loading',
+        'Advanced 3D NAND technology for reliability and endurance',
+        'Integrated aluminum heat sink for thermal management',
+        'Dynamic SLC caching and intelligent TurboWrite acceleration',
+        '5-year warranty with migration software included',
+        'Compatible with PlayStation 5 and latest gaming systems'
+      ],
+      specifications: {
+        'Interface': 'PCIe 4.0 x4, NVMe 1.4',
+        'Form Factor': 'M.2 2280',
+        'Capacity': '2TB (2,000GB)',
+        'Sequential Read': 'Up to 7,400 MB/s',
+        'Sequential Write': 'Up to 6,900 MB/s',
+        'Random Read': 'Up to 1,000K IOPS',
+        'Random Write': 'Up to 1,200K IOPS',
+        'NAND Flash': '3D TLC V-NAND',
+        'Controller': 'Samsung Elpis',
+        'Cache': 'LPDDR4 DRAM + SLC',
+        'Endurance': '1,200 TBW',
+        'Operating Temp': '0°C to 70°C',
+        'Dimensions': '80 x 22 x 8.6 mm',
+        'Weight': '9.5g',
+        'Warranty': '5 year limited warranty'
+      },
+      rating: 4.8,
+      totalReviews: 278
     }
   };
 
@@ -186,14 +522,14 @@ const ProductDetail = () => {
       author: 'Sophia Carter',
       time: '2 months ago',
       rating: 5,
-      comment: `This ${product.name.toLowerCase()} is amazing! It's super fast and the display is beautiful. Perfect for both work and entertainment.`
+      comment: `This ${product.name.toLowerCase()} is amazing! It's super fast and the performance is excellent. Perfect for both work and entertainment.`
     },
     {
       id: 2,
       author: 'Ethan Bennett',
       time: '3 months ago',
       rating: 4,
-      comment: `Great ${product.category.toLowerCase()} for the price. It's lightweight and has a good battery life. The keyboard is comfortable to type on.`
+      comment: `Great ${product.category.toLowerCase()} for the price. The build quality is solid and it meets all my requirements perfectly.`
     }
   ];
 
@@ -240,7 +576,9 @@ const ProductDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">
-          <Link to="/laptops" className="text-red-600">Laptops</Link>
+          <Link to={`/${product.category.toLowerCase()}s`} className="text-red-600 capitalize">
+            {product.category}s
+          </Link>
           <span>/</span>
           <span>{product.name}</span>
         </div>
