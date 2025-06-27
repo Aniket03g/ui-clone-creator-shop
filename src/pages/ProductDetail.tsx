@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
@@ -9,172 +10,155 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
 
 const ProductDetail = () => {
+  const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
-  const product = {
-    id: 1,
-    name: 'UltraBook Pro 15',
-    subtitle: '15.6-inch 16GB RAM 512GB SSD Intel Core i7',
-    price: 97425,
-    category: 'Laptop',
-    images: [
-      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=400&fit=crop'
-    ],
-    aboutItem: [
-      'Ultra-portable design with premium aluminum construction for durability and style',
-      'High-performance Intel Core i7 processor delivers exceptional speed for multitasking',
-      'Stunning 15.6-inch Full HD display with vibrant colors and sharp detail',
-      '16GB of high-speed DDR4 RAM ensures smooth performance even with demanding applications',
-      '512GB PCIe NVMe SSD provides lightning-fast boot times and file access',
-      'Advanced Intel Xe Graphics for enhanced visual performance and content creation',
-      'All-day battery life up to 10 hours for uninterrupted productivity',
-      'Comprehensive connectivity with USB-C, USB-A, HDMI, and audio ports',
-      'Fast and reliable Wi-Fi 6 and Bluetooth 5.1 for seamless wireless connectivity',
-      'Backlit keyboard for comfortable typing in any lighting condition'
-    ],
-    specifications: {
-      // Display Specifications
-      'Display Size': '15.6 inches',
-      'Display Type': 'Full HD IPS Anti-Glare',
-      'Resolution': '1920 x 1080 pixels',
-      'Pixel Density': '141 PPI',
-      'Brightness': '300 nits',
-      'Color Gamut': 'sRGB 99%',
-      'Refresh Rate': '60Hz',
-      'Aspect Ratio': '16:9',
-      
-      // Processor Specifications
-      'Processor Brand': 'Intel',
-      'Processor Model': 'Core i7-1165G7',
-      'Processor Generation': '11th Gen',
-      'Processor Speed': '2.8 GHz (Base), 4.7 GHz (Turbo)',
-      'Number of Cores': '4 Cores',
-      'Number of Threads': '8 Threads',
-      'Cache Memory': '12MB Intel Smart Cache',
-      'Processor Architecture': '64-bit',
-      'Manufacturing Process': '10nm SuperFin',
-      
-      // Memory Specifications
-      'RAM Size': '16GB',
-      'RAM Type': 'DDR4',
-      'RAM Speed': '3200MHz',
-      'Memory Slots': '2 (1 occupied)',
-      'Maximum Memory': '32GB',
-      'Memory Configuration': '1 x 16GB',
-      
-      // Storage Specifications
-      'Storage Type': 'SSD',
-      'Storage Capacity': '512GB',
-      'Storage Interface': 'PCIe NVMe 3.0',
-      'Storage Speed': 'Up to 3,500 MB/s read',
-      'Additional Storage': 'M.2 slot available',
-      'Hard Drive': 'None',
-      
-      // Graphics Specifications
-      'Graphics Card': 'Intel Xe Graphics',
-      'Graphics Memory': 'Shared with system memory',
-      'Graphics Clock Speed': '1.3 GHz',
-      'Display Output': 'Up to 4K @ 60Hz',
-      'Multiple Display Support': 'Yes, up to 3 displays',
-      
-      // Audio Specifications
-      'Audio Technology': 'Dolby Audio Premium',
-      'Speakers': 'Dual stereo speakers',
-      'Microphone': 'Dual-array digital microphone',
-      'Audio Jack': '3.5mm combo headphone/microphone',
-      
-      // Connectivity Specifications
-      'Wi-Fi Standard': 'Wi-Fi 6 (802.11ax)',
-      'Wi-Fi Speed': 'Up to 2.4 Gbps',
-      'Bluetooth Version': 'Bluetooth 5.1',
-      'Ethernet': 'Not available',
-      'NFC': 'Not supported',
-      
-      // Port Specifications
-      'USB-C Ports': '2 x Thunderbolt 4',
-      'USB-A Ports': '1 x USB 3.2 Gen 1',
-      'HDMI Port': '1 x HDMI 2.0',
-      'Audio Port': '1 x 3.5mm combo jack',
-      'SD Card Reader': 'Yes, microSD',
-      'Power Port': 'USB-C (either port)',
-      
-      // Input Specifications
-      'Keyboard Type': 'Backlit chiclet keyboard',
-      'Keyboard Layout': 'QWERTY',
-      'Trackpad': 'Precision touchpad',
-      'Trackpad Size': '4.3 x 2.8 inches',
-      'Multi-touch Support': 'Yes, Windows Precision',
-      
-      // Camera Specifications
-      'Webcam Resolution': '720p HD',
-      'Webcam Features': 'Privacy shutter, Windows Hello',
-      'Webcam Position': 'Top bezel center',
-      
-      // Battery Specifications
-      'Battery Type': 'Lithium-ion',
-      'Battery Capacity': '56Wh',
-      'Battery Life': 'Up to 10 hours',
-      'Charging Technology': 'Fast charging via USB-C',
-      'Charging Time': '80% in 1 hour',
-      'Power Adapter': '65W USB-C charger',
-      
-      // Physical Specifications
-      'Dimensions (W x D x H)': '357.6 x 234 x 17.9 mm',
-      'Weight': '1.69 kg (3.7 lbs)',
-      'Build Material': 'Aluminum alloy',
-      'Color Options': 'Space Gray, Silver',
-      'Finish': 'Anodized aluminum',
-      
-      // Security Features
-      'Fingerprint Reader': 'Yes, integrated with power button',
-      'TPM Chip': 'TPM 2.0',
-      'Secure Boot': 'Yes',
-      'Windows Hello': 'Face recognition and fingerprint',
-      'Kensington Lock': 'Yes',
-      
-      // Software Specifications
-      'Operating System': 'Windows 11 Home',
-      'Pre-installed Software': 'Microsoft Office trial',
-      'Bloatware': 'Minimal pre-installed apps',
-      'Driver Support': 'Automatic via Windows Update',
-      
-      // Environmental Specifications
-      'Operating Temperature': '5°C to 35°C',
-      'Storage Temperature': '-20°C to 60°C',
-      'Humidity': '20% to 80% RH',
-      'Altitude': 'Up to 3,048m operating',
-      
-      // Compliance & Certifications
-      'Energy Star': 'Certified',
-      'EPEAT Rating': 'Gold',
-      'Regulatory Compliance': 'FCC, CE, RoHS',
-      'Warranty': '1 year limited hardware warranty',
-      'Support': '24/7 technical support'
-    },
-    rating: 4.5,
-    totalReviews: 125,
-    reviews: [
-      {
-        id: 1,
-        author: 'Sophia Carter',
-        time: '2 months ago',
-        rating: 5,
-        comment: 'This laptop is amazing! It\'s super fast and the display is beautiful. Perfect for both work and entertainment.'
+  // Sample products data - in a real app this would come from an API
+  const products = {
+    1: {
+      id: 1,
+      name: 'UltraBook Pro 15',
+      subtitle: '15.6-inch 16GB RAM 512GB SSD Intel Core i7',
+      price: 97425,
+      category: 'Laptop',
+      images: [
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Ultra-portable design with premium aluminum construction for durability and style',
+        'High-performance Intel Core i7 processor delivers exceptional speed for multitasking',
+        'Stunning 15.6-inch Full HD display with vibrant colors and sharp detail',
+        '16GB of high-speed DDR4 RAM ensures smooth performance even with demanding applications',
+        '512GB PCIe NVMe SSD provides lightning-fast boot times and file access',
+        'Advanced Intel Xe Graphics for enhanced visual performance and content creation',
+        'All-day battery life up to 10 hours for uninterrupted productivity',
+        'Comprehensive connectivity with USB-C, USB-A, HDMI, and audio ports'
+      ],
+      specifications: {
+        'Display Size': '15.6 inches',
+        'Display Type': 'Full HD IPS Anti-Glare',
+        'Resolution': '1920 x 1080 pixels',
+        'Processor': 'Intel Core i7-1165G7',
+        'Processor Speed': '2.8 GHz (Base), 4.7 GHz (Turbo)',
+        'RAM Size': '16GB DDR4',
+        'Storage': '512GB PCIe NVMe SSD',
+        'Graphics': 'Intel Xe Graphics',
+        'Operating System': 'Windows 11 Home',
+        'Battery Life': 'Up to 10 hours',
+        'Weight': '1.69 kg (3.7 lbs)',
+        'Dimensions': '357.6 x 234 x 17.9 mm',
+        'Wi-Fi': 'Wi-Fi 6 (802.11ax)',
+        'Bluetooth': 'Bluetooth 5.1',
+        'USB Ports': '2x USB-C, 1x USB-A',
+        'HDMI': 'HDMI 2.0',
+        'Webcam': '720p HD with privacy shutter',
+        'Keyboard': 'Backlit chiclet keyboard',
+        'Audio': 'Dolby Audio Premium',
+        'Warranty': '1 year limited warranty'
       },
-      {
-        id: 2,
-        author: 'Ethan Bennett',
-        time: '3 months ago',
-        rating: 4,
-        comment: 'Great laptop for the price. It\'s lightweight and has a good battery life. The keyboard is comfortable to type on.'
-      }
-    ]
+      rating: 4.5,
+      totalReviews: 125
+    },
+    2: {
+      id: 2,
+      name: 'Gaming Beast X1',
+      subtitle: '17.3-inch 32GB RAM 1TB SSD RTX 4060',
+      price: 125000,
+      category: 'Laptop',
+      images: [
+        'https://images.unsplash.com/photo-1593640393608-3b4e0b07b25c?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Ultimate gaming performance with RTX 4060 graphics card',
+        'Lightning-fast AMD Ryzen 7 processor for seamless multitasking',
+        'Immersive 17.3-inch Full HD 144Hz display for smooth gameplay',
+        '32GB DDR4 RAM for handling the most demanding games and applications',
+        '1TB NVMe SSD for instant game loading and file access',
+        'Advanced cooling system to maintain peak performance',
+        'RGB backlit gaming keyboard with customizable lighting',
+        'Premium audio system with enhanced bass for immersive gaming'
+      ],
+      specifications: {
+        'Display Size': '17.3 inches',
+        'Display Type': 'Full HD IPS 144Hz',
+        'Resolution': '1920 x 1080 pixels',
+        'Processor': 'AMD Ryzen 7 6800H',
+        'Processor Speed': '3.2 GHz (Base), 4.7 GHz (Boost)',
+        'RAM Size': '32GB DDR4',
+        'Storage': '1TB PCIe NVMe SSD',
+        'Graphics': 'NVIDIA RTX 4060 8GB',
+        'Operating System': 'Windows 11 Home',
+        'Battery Life': 'Up to 6 hours',
+        'Weight': '2.8 kg (6.2 lbs)',
+        'Dimensions': '395 x 262 x 25 mm',
+        'Wi-Fi': 'Wi-Fi 6E (802.11ax)',
+        'Bluetooth': 'Bluetooth 5.2',
+        'USB Ports': '3x USB-A, 2x USB-C',
+        'HDMI': 'HDMI 2.1',
+        'Webcam': '1080p HD with privacy shutter',
+        'Keyboard': 'RGB backlit mechanical',
+        'Audio': '2x 5W speakers with subwoofer',
+        'Warranty': '2 year limited warranty'
+      },
+      rating: 4.7,
+      totalReviews: 89
+    },
+    3: {
+      id: 3,
+      name: 'Business Elite 14',
+      subtitle: '14-inch 8GB RAM 256GB SSD Intel Core i5',
+      price: 55000,
+      category: 'Laptop',
+      images: [
+        'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
+        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=400&fit=crop'
+      ],
+      aboutItem: [
+        'Sleek and professional design perfect for business environments',
+        'Reliable Intel Core i5 processor for everyday productivity tasks',
+        'Crisp 14-inch Full HD display for clear document viewing',
+        '8GB DDR4 RAM for smooth multitasking and application performance',
+        '256GB SSD for quick boot times and responsive file access',
+        'Long-lasting battery life for all-day productivity',
+        'Lightweight design for easy portability',
+        'Enhanced security features for business data protection'
+      ],
+      specifications: {
+        'Display Size': '14 inches',
+        'Display Type': 'Full HD IPS',
+        'Resolution': '1920 x 1080 pixels',
+        'Processor': 'Intel Core i5-1235U',
+        'Processor Speed': '2.1 GHz (Base), 4.4 GHz (Turbo)',
+        'RAM Size': '8GB DDR4',
+        'Storage': '256GB PCIe NVMe SSD',
+        'Graphics': 'Intel Iris Xe Graphics',
+        'Operating System': 'Windows 11 Pro',
+        'Battery Life': 'Up to 12 hours',
+        'Weight': '1.4 kg (3.1 lbs)',
+        'Dimensions': '321 x 212 x 18 mm',
+        'Wi-Fi': 'Wi-Fi 6 (802.11ax)',
+        'Bluetooth': 'Bluetooth 5.1',
+        'USB Ports': '2x USB-C, 1x USB-A',
+        'HDMI': 'HDMI 1.4',
+        'Webcam': '720p HD with privacy shutter',
+        'Keyboard': 'Backlit keyboard',
+        'Audio': 'Stereo speakers',
+        'Warranty': '3 year business warranty'
+      },
+      rating: 4.3,
+      totalReviews: 156
+    }
   };
+
+  const product = products[parseInt(id) || 1] || products[1];
 
   const relatedProducts = [
     {
@@ -194,6 +178,23 @@ const ProductDetail = () => {
       name: 'Ergonomic Wireless Mouse',
       description: 'Comfortable and precise mouse',
       image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300&h=200&fit=crop'
+    }
+  ];
+
+  const reviews = [
+    {
+      id: 1,
+      author: 'Sophia Carter',
+      time: '2 months ago',
+      rating: 5,
+      comment: `This ${product.name.toLowerCase()} is amazing! It's super fast and the display is beautiful. Perfect for both work and entertainment.`
+    },
+    {
+      id: 2,
+      author: 'Ethan Bennett',
+      time: '3 months ago',
+      rating: 4,
+      comment: `Great ${product.category.toLowerCase()} for the price. It's lightweight and has a good battery life. The keyboard is comfortable to type on.`
     }
   ];
 
@@ -242,7 +243,7 @@ const ProductDetail = () => {
         <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">
           <Link to="/laptops" className="text-red-600">Laptops</Link>
           <span>/</span>
-          <span>UltraBook Pro 15</span>
+          <span>{product.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
@@ -334,38 +335,16 @@ const ProductDetail = () => {
               </Card>
             </div>
 
-            {/* Expanded Specifications - Part of scrollable content */}
+            {/* Technical Specifications */}
             <div className="pt-4">
               <h2 className="text-2xl font-bold text-stone-900 mb-6">Technical Specifications</h2>
               <Card>
                 <CardContent className="p-6">
-                  <div className="space-y-8">
-                    {/* Group specifications by category */}
-                    {Object.entries({
-                      'Display': ['Display Size', 'Display Type', 'Resolution', 'Pixel Density', 'Brightness', 'Color Gamut', 'Refresh Rate', 'Aspect Ratio'],
-                      'Processor': ['Processor Brand', 'Processor Model', 'Processor Generation', 'Processor Speed', 'Number of Cores', 'Number of Threads', 'Cache Memory', 'Processor Architecture', 'Manufacturing Process'],
-                      'Memory & Storage': ['RAM Size', 'RAM Type', 'RAM Speed', 'Memory Slots', 'Maximum Memory', 'Memory Configuration', 'Storage Type', 'Storage Capacity', 'Storage Interface', 'Storage Speed', 'Additional Storage'],
-                      'Graphics & Audio': ['Graphics Card', 'Graphics Memory', 'Graphics Clock Speed', 'Display Output', 'Multiple Display Support', 'Audio Technology', 'Speakers', 'Microphone', 'Audio Jack'],
-                      'Connectivity': ['Wi-Fi Standard', 'Wi-Fi Speed', 'Bluetooth Version', 'Ethernet', 'NFC'],
-                      'Ports & I/O': ['USB-C Ports', 'USB-A Ports', 'HDMI Port', 'Audio Port', 'SD Card Reader', 'Power Port'],
-                      'Input & Camera': ['Keyboard Type', 'Keyboard Layout', 'Trackpad', 'Trackpad Size', 'Multi-touch Support', 'Webcam Resolution', 'Webcam Features', 'Webcam Position'],
-                      'Battery & Power': ['Battery Type', 'Battery Capacity', 'Battery Life', 'Charging Technology', 'Charging Time', 'Power Adapter'],
-                      'Physical Design': ['Dimensions (W x D x H)', 'Weight', 'Build Material', 'Color Options', 'Finish'],
-                      'Security & Software': ['Fingerprint Reader', 'TPM Chip', 'Secure Boot', 'Windows Hello', 'Kensington Lock', 'Operating System', 'Pre-installed Software', 'Bloatware', 'Driver Support'],
-                      'Environmental & Compliance': ['Operating Temperature', 'Storage Temperature', 'Humidity', 'Altitude', 'Energy Star', 'EPEAT Rating', 'Regulatory Compliance', 'Warranty', 'Support']
-                    }).map(([category, specs]) => (
-                      <div key={category}>
-                        <h3 className="text-lg font-semibold text-stone-900 mb-4 border-b border-stone-200 pb-2">{category}</h3>
-                        <div className="grid grid-cols-1 gap-3">
-                          {specs.map((spec) => (
-                            product.specifications[spec] && (
-                              <div key={spec} className="flex justify-between py-2 border-b border-stone-100 last:border-b-0">
-                                <span className="font-medium text-stone-900 text-sm">{spec}</span>
-                                <span className="text-stone-600 text-sm text-right ml-4">{product.specifications[spec]}</span>
-                              </div>
-                            )
-                          ))}
-                        </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-3 border-b border-stone-100 last:border-b-0">
+                        <span className="font-medium text-stone-900">{key}</span>
+                        <span className="text-stone-600 text-right ml-4">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -379,7 +358,7 @@ const ProductDetail = () => {
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-stone-900 mb-6">Customer Reviews</h2>
           <div className="space-y-6">
-            {product.reviews.map((review) => (
+            {reviews.map((review) => (
               <Card key={review.id}>
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
