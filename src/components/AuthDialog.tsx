@@ -23,7 +23,9 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
     password: '',
     firstName: '',
     lastName: '',
-    phone: ''
+    phone: '',
+    aadharNumber: '',
+    gstNumber: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +47,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           description: isLogin ? "You've been signed in successfully." : "Your account has been created and you're now signed in.",
         });
         onOpenChange(false);
-        setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '' });
+        setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', aadharNumber: '', gstNumber: '' });
       } else {
         toast({
           title: "Error",
@@ -73,7 +75,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isLogin ? 'Sign In' : 'Create Account'}</DialogTitle>
         </DialogHeader>
@@ -129,16 +131,43 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           </div>
 
           {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="aadharNumber">Aadhar Card Number (Optional)</Label>
+                <Input
+                  id="aadharNumber"
+                  name="aadharNumber"
+                  type="text"
+                  placeholder="Enter 12-digit Aadhar number"
+                  value={formData.aadharNumber}
+                  onChange={handleInputChange}
+                  maxLength={12}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="gstNumber">GST Number (Optional)</Label>
+                <Input
+                  id="gstNumber"
+                  name="gstNumber"
+                  type="text"
+                  placeholder="Enter GST number"
+                  value={formData.gstNumber}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </>
           )}
 
           <Button type="submit" className="w-full" disabled={isLoading}>

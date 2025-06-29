@@ -7,6 +7,8 @@ interface User {
   firstName: string;
   lastName: string;
   phone: string;
+  aadharNumber?: string;
+  gstNumber?: string;
   addresses: Address[];
 }
 
@@ -39,6 +41,8 @@ interface RegisterData {
   firstName: string;
   lastName: string;
   phone: string;
+  aadharNumber?: string;
+  gstNumber?: string;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -81,6 +85,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
+        aadharNumber: userData.aadharNumber,
+        gstNumber: userData.gstNumber,
         addresses: []
       };
       setUser(newUser);
