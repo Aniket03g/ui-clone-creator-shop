@@ -16,6 +16,7 @@ import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import SearchResults from "./pages/SearchResults";
 import Profile from "./pages/Profile";
+import About from "./pages/About";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import ReturnsPolicy from "./pages/ReturnsPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -47,6 +48,7 @@ const App = () => (
                   <Route path="/wishlist" element={<Wishlist />} />
                   <Route path="/search" element={<SearchResults />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/about" element={<About />} />
                   <Route path="/shipping-policy" element={<ShippingPolicy />} />
                   <Route path="/returns-policy" element={<ReturnsPolicy />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
