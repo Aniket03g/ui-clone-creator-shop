@@ -283,12 +283,6 @@ const AmazonHeader = () => {
             <Link to="/deals" className="text-white hover:text-red-400 transition-colors font-medium">
               Today's Deals
             </Link>
-            <Link to="/customer-service" className="text-white hover:text-red-400 transition-colors font-medium">
-              Customer Service
-            </Link>
-            <Link to="/gift-cards" className="text-white hover:text-red-400 transition-colors font-medium">
-              Gift Cards
-            </Link>
           </div>
         </div>
       </div>

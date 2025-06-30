@@ -655,6 +655,48 @@ const ProductDetail = () => {
               </Button>
             </div>
 
+            {/* Return Policy Section */}
+            <div className="pt-4">
+              <h2 className="text-2xl font-bold text-stone-900 mb-4">Return Policy</h2>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <div>
+                        <h3 className="font-semibold text-stone-900 mb-1">30-Day Return Window</h3>
+                        <p className="text-stone-700 text-sm">You can return this item within 30 days of delivery if it's in original condition with all accessories.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <div>
+                        <h3 className="font-semibold text-stone-900 mb-1">Customer Pays Return Shipping</h3>
+                        <p className="text-stone-700 text-sm">Return shipping costs are the customer's responsibility. We recommend using a trackable service.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <div>
+                        <h3 className="font-semibold text-stone-900 mb-1">Return Authorization Required</h3>
+                        <p className="text-stone-700 text-sm">Contact us for a Return Authorization Number (RAN) before shipping any returns.</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-red-50 rounded-lg">
+                      <p className="text-red-800 text-sm font-medium">
+                        <strong>Note:</strong> Software products and digital licenses cannot be returned once activated. Custom orders are final sale.
+                      </p>
+                    </div>
+                    <div className="mt-4">
+                      <Link to="/returns-policy" className="text-red-600 hover:text-red-700 font-medium text-sm">
+                        View Full Return Policy →
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* About this item Section */}
             <div className="pt-4">
               <h2 className="text-2xl font-bold text-stone-900 mb-4">About this item</h2>
