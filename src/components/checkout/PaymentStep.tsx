@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CreditCard, Smartphone, Building, Banknote } from 'lucide-react';
+import { CreditCard, Smartphone, Building } from 'lucide-react';
 
 interface PaymentStepProps {
   onNext: (paymentMethod: string) => void;
@@ -59,13 +59,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ onNext, onBack }) => {
             <Label htmlFor="netbanking" className="flex items-center space-x-2 cursor-pointer">
               <Building className="w-4 h-4" />
               <span>Net Banking</span>
-            </Label>
-          </div>
-          <div className="flex items-center space-x-3 p-4 border border-stone-200 rounded-lg">
-            <RadioGroupItem value="cod" id="cod" />
-            <Label htmlFor="cod" className="flex items-center space-x-2 cursor-pointer">
-              <Banknote className="w-4 h-4" />
-              <span>Cash on Delivery</span>
             </Label>
           </div>
         </RadioGroup>

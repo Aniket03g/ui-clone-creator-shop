@@ -54,31 +54,53 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     // Check for stored user data on mount
     const storedUser = localStorage.getItem('techshop_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        localStorage.removeItem('techshop_user');
+      }
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Mock login - in real app, this would call an API
     if (email && password) {
-      const mockUser: User = {
-        id: '1',
-        email,
-        firstName: 'John',
-        lastName: 'Doe',
-        phone: '',
-        addresses: []
-      };
-      setUser(mockUser);
-      localStorage.setItem('techshop_user', JSON.stringify(mockUser));
-      return true;
+      // Check if user exists in localStorage (for demo purposes)
+      const existingUsers = JSON.parse(localStorage.getItem('techshop_users') || '[]');
+      const existingUser = existingUsers.find((u: any) => u.email === email);
+      
+      if (existingUser) {
+        setUser(existingUser);
+        localStorage.setItem('techshop_user', JSON.stringify(existingUser));
+        return true;
+      } else {
+        // Create a mock user for demo
+        const mockUser: User = {
+          id: '1',
+          email,
+          firstName: 'John',
+          lastName: 'Doe',
+          phone: '9876543210',
+          aadharNumber: '123456789012',
+          addresses: []
+        };
+        setUser(mockUser);
+        localStorage.setItem('techshop_user', JSON.stringify(mockUser));
+        return true;
+      }
     }
     return false;
   };
 
   const register = async (userData: RegisterData): Promise<boolean> => {
+    // Validate that either Aadhar or GST is provided
+    if (!userData.aadharNumber && !userData.gstNumber) {
+      throw new Error('Either Aadhar Card Number or GST Number is required');
+    }
+
     // Mock registration - in real app, this would call an API
-    if (userData.email && userData.password) {
+    if (userData.email && userData.password && userData.firstName && userData.lastName && userData.phone) {
       const newUser: User = {
         id: Date.now().toString(),
         email: userData.email,
@@ -89,6 +111,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         gstNumber: userData.gstNumber,
         addresses: []
       };
+      
+      // Store user in users list (for demo purposes)
+      const existingUsers = JSON.parse(localStorage.getItem('techshop_users') || '[]');
+      existingUsers.push(newUser);
+      localStorage.setItem('techshop_users', JSON.stringify(existingUsers));
+      
       setUser(newUser);
       localStorage.setItem('techshop_user', JSON.stringify(newUser));
       return true;
@@ -106,6 +134,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
       localStorage.setItem('techshop_user', JSON.stringify(updatedUser));
+      
+      // Update in users list as well
+      const existingUsers = JSON.parse(localStorage.getItem('techshop_users') || '[]');
+      const updatedUsers = existingUsers.map((u: User) => 
+        u.id === user.id ? updatedUser : u
+      );
+      localStorage.setItem('techshop_users', JSON.stringify(updatedUsers));
     }
   };
 

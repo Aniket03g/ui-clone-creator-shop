@@ -28,8 +28,40 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
     gstNumber: ''
   });
 
+  const [validationError, setValidationError] = useState('');
+
+  const validateSignupForm = () => {
+    if (!isLogin) {
+      // Check if either Aadhar or GST is provided
+      if (!formData.aadharNumber && !formData.gstNumber) {
+        setValidationError('Either Aadhar Card Number or GST Number is required');
+        return false;
+      }
+      
+      // Validate Aadhar format if provided
+      if (formData.aadharNumber && formData.aadharNumber.length !== 12) {
+        setValidationError('Aadhar Card Number must be exactly 12 digits');
+        return false;
+      }
+      
+      // Basic validation for required fields
+      if (!formData.firstName || !formData.lastName || !formData.phone) {
+        setValidationError('All fields are required');
+        return false;
+      }
+    }
+    
+    setValidationError('');
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateSignupForm()) {
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -48,6 +80,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
         });
         onOpenChange(false);
         setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', aadharNumber: '', gstNumber: '' });
+        setValidationError('');
       } else {
         toast({
           title: "Error",
@@ -71,6 +104,16 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+    // Clear validation error when user starts typing
+    if (validationError) {
+      setValidationError('');
+    }
+  };
+
+  const toggleAuthMode = () => {
+    setIsLogin(!isLogin);
+    setValidationError('');
+    setFormData({ email: '', password: '', firstName: '', lastName: '', phone: '', aadharNumber: '', gstNumber: '' });
   };
 
   return (
@@ -84,7 +127,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           {!isLogin && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">First Name *</Label>
                 <Input
                   id="firstName"
                   name="firstName"
@@ -94,7 +137,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">Last Name *</Label>
                 <Input
                   id="lastName"
                   name="lastName"
@@ -107,7 +150,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Email *</Label>
             <Input
               id="email"
               name="email"
@@ -119,7 +162,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Password *</Label>
             <Input
               id="password"
               name="password"
@@ -133,41 +176,56 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
           {!isLogin && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Phone Number *</Label>
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={handleInputChange}
+                  required={!isLogin}
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="aadharNumber">Aadhar Card Number (Optional)</Label>
-                <Input
-                  id="aadharNumber"
-                  name="aadharNumber"
-                  type="text"
-                  placeholder="Enter 12-digit Aadhar number"
-                  value={formData.aadharNumber}
-                  onChange={handleInputChange}
-                  maxLength={12}
-                />
-              </div>
+              <div className="space-y-4 p-4 bg-stone-50 rounded-lg">
+                <p className="text-sm font-medium text-stone-700">
+                  Identity Verification (Choose One) *
+                </p>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="aadharNumber">Aadhar Card Number</Label>
+                  <Input
+                    id="aadharNumber"
+                    name="aadharNumber"
+                    type="text"
+                    placeholder="Enter 12-digit Aadhar number"
+                    value={formData.aadharNumber}
+                    onChange={handleInputChange}
+                    maxLength={12}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="gstNumber">GST Number (Optional)</Label>
-                <Input
-                  id="gstNumber"
-                  name="gstNumber"
-                  type="text"
-                  placeholder="Enter GST number"
-                  value={formData.gstNumber}
-                  onChange={handleInputChange}
-                />
+                <div className="text-center text-stone-500 text-sm">OR</div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gstNumber">GST Number</Label>
+                  <Input
+                    id="gstNumber"
+                    name="gstNumber"
+                    type="text"
+                    placeholder="Enter GST number"
+                    value={formData.gstNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
             </>
+          )}
+
+          {validationError && (
+            <div className="text-red-600 text-sm p-2 bg-red-50 rounded">
+              {validationError}
+            </div>
           )}
 
           <Button type="submit" className="w-full" disabled={isLoading}>
@@ -178,7 +236,7 @@ const AuthDialog = ({ open, onOpenChange }: AuthDialogProps) => {
         <div className="text-center">
           <Button
             variant="link"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={toggleAuthMode}
             className="text-sm"
           >
             {isLogin ? "Don't have an account? Create one" : "Already have an account? Sign in"}
