@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +19,7 @@ import About from "./pages/About";
 import ShippingPolicy from "./pages/ShippingPolicy";
 import ReturnsPolicy from "./pages/ReturnsPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,11 +43,6 @@ const App = () => (
                   <Route path="/ups" element={<Products />} />
                   <Route path="/components" element={<Products />} />
                   <Route path="/electronics" element={<Products />} />
-                  <Route path="/books" element={<Products />} />
-                  <Route path="/clothing" element={<Products />} />
-                  <Route path="/home-garden" element={<Products />} />
-                  <Route path="/sports-outdoors" element={<Products />} />
-                  <Route path="/health-beauty" element={<Products />} />
                   <Route path="/deals" element={<Products />} />
                   <Route path="/customer-service" element={<About />} />
                   <Route path="/gift-cards" element={<Products />} />
@@ -61,6 +56,8 @@ const App = () => (
                   <Route path="/shipping-policy" element={<ShippingPolicy />} />
                   <Route path="/returns-policy" element={<ReturnsPolicy />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

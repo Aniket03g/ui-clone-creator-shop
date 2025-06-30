@@ -1,106 +1,103 @@
 
-import React from 'react';
 import Header from '@/components/Header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-stone-900 mb-8">Privacy Policy</h1>
-        
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Information We Collect</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-stone-700">We collect information you provide directly to us, such as:</p>
-              <ul className="list-disc list-inside text-stone-700 space-y-1">
-                <li>Personal details (name, email, phone number)</li>
-                <li>Government identification (Aadhar card number, GST number)</li>
-                <li>Shipping and billing addresses</li>
-                <li>Payment information</li>
-                <li>Order history and preferences</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>How We Use Your Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside text-stone-700 space-y-1">
-                <li>Process and fulfill your orders</li>
-                <li>Communicate about your orders and account</li>
-                <li>Provide customer support</li>
-                <li>Send promotional communications (with consent)</li>
-                <li>Improve our services and website</li>
-                <li>Comply with legal obligations</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Information Sharing</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-stone-700">We do not sell, trade, or rent your personal information to third parties. We may share information with:</p>
-              <ul className="list-disc list-inside text-stone-700 space-y-1 mt-2">
-                <li>Service providers who assist in our operations</li>
-                <li>Payment processors for transaction processing</li>
-                <li>Shipping companies for order delivery</li>
-                <li>Legal authorities when required by law</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Security</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-stone-700">We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Your Aadhar and GST numbers are encrypted and stored securely.</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Rights</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside text-stone-700 space-y-1">
-                <li>Access your personal information</li>
-                <li>Correct inaccurate information</li>
-                <li>Delete your account and data</li>
-                <li>Opt-out of marketing communications</li>
-                <li>Data portability</li>
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Cookies and Tracking</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-stone-700">We use cookies and similar technologies to enhance your browsing experience, analyze website traffic, and personalize content.</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Us</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-stone-700">If you have questions about this Privacy Policy, please contact us at privacy@techshop.com or call +91-1234567890.</p>
-            </CardContent>
-          </Card>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-stone-900 mb-4">Privacy Policy</h1>
+          <p className="text-stone-600">Last updated: December 2024</p>
         </div>
+
+        <Card className="mb-8">
+          <CardContent className="p-8 space-y-8">
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Information We Collect</h2>
+              <div className="space-y-4 text-stone-700">
+                <p>We collect information you provide directly to us, such as when you:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Create an account or make a purchase</li>
+                  <li>Subscribe to our newsletter or marketing communications</li>
+                  <li>Contact us for customer support</li>
+                  <li>Participate in surveys or promotions</li>
+                </ul>
+                <p>This may include your name, email address, phone number, shipping address, payment information, and preferences.</p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">How We Use Your Information</h2>
+              <div className="space-y-4 text-stone-700">
+                <p>We use the information we collect to:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Process and fulfill your orders and transactions</li>
+                  <li>Provide customer service and technical support</li>
+                  <li>Send you important updates about your orders and account</li>
+                  <li>Personalize your shopping experience</li>
+                  <li>Improve our products and services</li>
+                  <li>Comply with legal obligations</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Information Sharing</h2>
+              <div className="space-y-4 text-stone-700">
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>With service providers who help us operate our business</li>
+                  <li>When required by law or to protect our rights</li>
+                  <li>In connection with a business transfer or merger</li>
+                  <li>With your explicit consent</li>
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Data Security</h2>
+              <p className="text-stone-700">
+                We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Your Rights</h2>
+              <div className="space-y-4 text-stone-700">
+                <p>You have the right to:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Access and update your personal information</li>
+                  <li>Request deletion of your personal information</li>
+                  <li>Opt-out of marketing communications</li>
+                  <li>Request a copy of your data</li>
+                </ul>
+                <p>To exercise these rights, please contact us at privacy@techshop.com</p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Cookies</h2>
+              <p className="text-stone-700">
+                We use cookies and similar technologies to enhance your browsing experience, analyze site traffic, and personalize content. You can control cookie settings through your browser preferences.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-stone-900 mb-4">Contact Us</h2>
+              <div className="text-stone-700">
+                <p>If you have any questions about this Privacy Policy, please contact us:</p>
+                <div className="mt-4 space-y-2">
+                  <p>Email: privacy@techshop.com</p>
+                  <p>Phone: +91-11-1234-5678</p>
+                  <p>Address: 123 Tech Street, Delhi, India</p>
+                </div>
+              </div>
+            </section>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -7,67 +7,67 @@ import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useUser } from '@/contexts/UserContext';
 
-// Category data structure
+// Updated category data structure focused on tech/hardware
 const categories = {
-  'Electronics': [
-    'Mobile Phones',
-    'Laptops & Computers',
-    'Tablets',
-    'Cameras & Photography',
-    'Audio & Headphones',
-    'Smart Home',
-    'Gaming',
-    'Wearable Technology'
+  'Laptops & Computers': [
+    'Gaming Laptops',
+    'Business Laptops',
+    'Desktop PCs',
+    'All-in-One PCs',
+    '2-in-1 Laptops',
+    'Workstations',
+    'Mini PCs',
+    'Refurbished Systems'
   ],
-  'Books': [
-    'Fiction',
-    'Non-Fiction',
-    'Textbooks',
-    'Business & Economics',
-    'Self-Help',
-    'Children\'s Books',
-    'Comics & Graphic Novels',
-    'Educational & Professional'
+  'Computer Components': [
+    'Processors (CPUs)',
+    'Graphics Cards (GPUs)',
+    'Memory (RAM)',
+    'Storage (SSD/HDD)',
+    'Motherboards',
+    'Power Supplies',
+    'Cooling Systems',
+    'Computer Cases'
   ],
-  'Clothing': [
-    'Women\'s Fashion',
-    'Men\'s Fashion',
-    'Kids & Baby',
-    'Shoes',
-    'Accessories',
-    'Jewelry',
-    'Watches',
-    'Bags & Luggage'
+  'Networking & Internet': [
+    'Wi-Fi Routers',
+    'Modems',
+    'Network Switches',
+    'Access Points',
+    'Network Cables',
+    'Firewalls',
+    'VPN Hardware',
+    'Mesh Systems'
   ],
-  'Home & Garden': [
-    'Kitchen & Dining',
-    'Home Decor',
-    'Furniture',
-    'Garden & Outdoor',
-    'Tools & Hardware',
-    'Bedding & Bath',
-    'Storage & Organization',
-    'Appliances'
+  'Power & UPS': [
+    'UPS Systems',
+    'Power Strips',
+    'Surge Protectors',
+    'Battery Backups',
+    'Voltage Stabilizers',
+    'Power Inverters',
+    'Solar Power Systems',
+    'Power Cables'
   ],
-  'Sports & Outdoors': [
-    'Exercise & Fitness',
-    'Outdoor Recreation',
-    'Sports Equipment',
-    'Water Sports',
-    'Winter Sports',
-    'Team Sports',
-    'Golf',
-    'Cycling'
+  'Software & Licenses': [
+    'Microsoft Office 365',
+    'Windows Operating System',
+    'Antivirus Software',
+    'Business Software',
+    'Design Software',
+    'Development Tools',
+    'Productivity Apps',
+    'Security Software'
   ],
-  'Health & Beauty': [
-    'Skincare',
-    'Makeup & Cosmetics',
-    'Hair Care',
-    'Personal Care',
-    'Health Supplements',
-    'Medical Supplies',
-    'Fragrances',
-    'Oral Care'
+  'Accessories & Peripherals': [
+    'Keyboards & Mice',
+    'Monitors & Displays',
+    'Webcams',
+    'Speakers & Headsets',
+    'External Storage',
+    'Cables & Adapters',
+    'Docking Stations',
+    'Printer & Scanners'
   ]
 };
 
@@ -80,7 +80,7 @@ const AmazonHeader = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCategory, setSearchCategory] = useState('All');
   const [showMegaMenu, setShowMegaMenu] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('Electronics');
+  const [activeCategory, setActiveCategory] = useState('Laptops & Computers');
   
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const allButtonRef = useRef<HTMLButtonElement>(null);
