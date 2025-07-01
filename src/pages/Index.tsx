@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart } from 'lucide-react';
+import { Heart, Star, ShoppingCart } from 'lucide-react';
 import Header from '@/components/Header';
 import DealsCarousel from '@/components/DealsCarousel';
+import BestsellersCarousel from '@/components/BestsellersCarousel';
+import CategoryGrid from '@/components/CategoryGrid';
 
 const Index = () => {
   const featuredProducts = [
@@ -15,7 +17,9 @@ const Index = () => {
       description: 'Experience lightning-fast processing and stunning visuals.',
       price: 97425,
       image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=400&fit=crop',
-      category: 'Laptops'
+      category: 'Laptops',
+      rating: 4.5,
+      tag: 'SALE'
     },
     {
       id: 2,
@@ -23,7 +27,9 @@ const Index = () => {
       description: 'Boost your internet speed and coverage with our latest router.',
       price: 11175,
       image: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=500&h=400&fit=crop',
-      category: 'Wi-Fi Routers'
+      category: 'Wi-Fi Routers',
+      rating: 4.8,
+      tag: 'NEW'
     },
     {
       id: 3,
@@ -31,7 +37,9 @@ const Index = () => {
       description: 'Combine power and elegance with our all-in-one PC.',
       price: 134925,
       image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=500&h=400&fit=crop',
-      category: 'All-in-One PCs'
+      category: 'All-in-One PCs',
+      rating: 4.3,
+      tag: null
     }
   ];
 
@@ -56,6 +64,21 @@ const Index = () => {
     }
   ];
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(rating)
+            ? 'fill-yellow-400 text-yellow-400'
+            : i < rating
+            ? 'fill-yellow-200 text-yellow-400'
+            : 'text-gray-300'
+        }`}
+      />
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
@@ -64,6 +87,13 @@ const Index = () => {
       <section className="py-4 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <DealsCarousel />
+        </div>
+      </section>
+
+      {/* Shop by Category Grid */}
+      <section className="py-8 bg-stone-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CategoryGrid />
         </div>
       </section>
 
@@ -101,9 +131,16 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-stone-900 mb-12 animate-fade-in">Featured Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product, index) => (
-              <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+              <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in relative" style={{ animationDelay: `${index * 100}ms` }}>
                 <CardContent className="p-0">
-                  <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
+                  <div className="aspect-[4/3] overflow-hidden rounded-t-lg relative">
+                    {product.tag && (
+                      <div className={`absolute top-3 left-3 z-10 px-2 py-1 text-xs font-bold text-white rounded ${
+                        product.tag === 'SALE' ? 'bg-red-500' : 'bg-green-500'
+                      }`}>
+                        {product.tag}
+                      </div>
+                    )}
                     <img
                       src={product.image}
                       alt={product.name}
@@ -111,21 +148,36 @@ const Index = () => {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-stone-900 mb-2 group-hover:text-red-600 transition-colors duration-200">{product.name}</h3>
+                    <h3 className="text-xl font-semibold text-stone-900 mb-2">{product.name}</h3>
+                    <div className="flex items-center mb-2">
+                      {renderStars(product.rating)}
+                      <span className="ml-2 text-sm text-stone-600">({product.rating})</span>
+                    </div>
                     <p className="text-stone-600 mb-4">{product.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-stone-900">₹{product.price.toLocaleString('en-IN')}</span>
-                      <Link to={`/product/${product.id}`}>
-                        <Button variant="outline" className="border-stone-300 hover:bg-stone-50 transform hover:scale-105 transition-all duration-200">
-                          View Details
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="border-stone-300 hover:bg-stone-50">
+                          <Heart className="w-4 h-4" />
                         </Button>
-                      </Link>
+                        <Button size="sm" className="bg-stone-800 hover:bg-stone-900 text-white">
+                          <ShoppingCart className="w-4 h-4 mr-1" />
+                          Add to Cart
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Bestsellers Section */}
+      <section className="py-16 bg-stone-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <BestsellersCarousel />
         </div>
       </section>
 
