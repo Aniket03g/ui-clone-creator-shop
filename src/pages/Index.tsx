@@ -141,14 +141,18 @@ const Index = () => {
                         {product.tag}
                       </div>
                     )}
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                    <Link to={`/product/${product.id}`}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </Link>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-stone-900 mb-2">{product.name}</h3>
+                    <Link to={`/product/${product.id}`}>
+                      <h3 className="text-xl font-semibold text-stone-900 mb-2 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
+                    </Link>
                     <div className="flex items-center mb-2">
                       {renderStars(product.rating)}
                       <span className="ml-2 text-sm text-stone-600">({product.rating})</span>
