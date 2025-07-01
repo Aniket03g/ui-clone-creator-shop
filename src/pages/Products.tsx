@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Heart } from 'lucide-react';
+import { Heart, Grid, List } from 'lucide-react';
 import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -20,6 +20,7 @@ const Products = () => {
   const [selectedBrand, setSelectedBrand] = useState('any');
   const [selectedRating, setSelectedRating] = useState('any');
   const [sortBy, setSortBy] = useState('newest');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   // Get current category from route
   const getCurrentCategory = () => {
@@ -29,12 +30,15 @@ const Products = () => {
     if (path === '/pcs') return 'pcs';
     if (path === '/ups') return 'ups';
     if (path === '/components') return 'components';
+    if (path === '/monitors') return 'monitors';
+    if (path === '/keyboards') return 'keyboards';
+    if (path === '/accessories') return 'accessories';
     return 'store';
   };
 
   const currentCategory = getCurrentCategory();
 
-  // Extended products data with more items and brands
+  // Extended products data with key details
   const allProducts = {
     laptops: [
       {
@@ -44,7 +48,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'TechShop',
-        rating: 4.5
+        rating: 4.5,
+        keyFeatures: ['Intel i7 Processor', '16GB RAM', '512GB SSD']
       },
       {
         id: 7,
@@ -53,7 +58,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'TechShop',
-        rating: 4.3
+        rating: 4.3,
+        keyFeatures: ['Intel i5 Processor', '8GB RAM', '256GB SSD']
       },
       {
         id: 8,
@@ -62,7 +68,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'TechShop',
-        rating: 4.7
+        rating: 4.7,
+        keyFeatures: ['AMD Ryzen 7', '32GB RAM', 'RTX 4060 GPU']
       },
       {
         id: 9,
@@ -118,7 +125,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'TechShop',
-        rating: 4.4
+        rating: 4.4,
+        keyFeatures: ['Wi-Fi 6', 'Dual Band', '1200 Mbps']
       },
       {
         id: 10,
@@ -306,6 +314,72 @@ const Products = () => {
         brand: 'AMD',
         rating: 4.6
       }
+    ],
+    monitors: [
+      {
+        id: 32,
+        name: 'UltraView 27" 4K',
+        price: 45000,
+        image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop',
+        category: 'Monitor',
+        brand: 'TechShop',
+        rating: 4.6,
+        keyFeatures: ['4K Resolution', '27 Inch', 'IPS Panel']
+      },
+      {
+        id: 33,
+        name: 'Gaming Monitor 32"',
+        price: 38000,
+        image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
+        category: 'Monitor',
+        brand: 'TechShop',
+        rating: 4.5,
+        keyFeatures: ['144Hz Refresh', '32 Inch', 'Curved Display']
+      }
+    ],
+    keyboards: [
+      {
+        id: 34,
+        name: 'Mechanical Pro RGB',
+        price: 8500,
+        image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop',
+        category: 'Keyboard',
+        brand: 'TechShop',
+        rating: 4.4,
+        keyFeatures: ['Mechanical Keys', 'RGB Backlight', 'Wireless']
+      },
+      {
+        id: 35,
+        name: 'Compact Wireless',
+        price: 3500,
+        image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=300&fit=crop',
+        category: 'Keyboard',
+        brand: 'TechShop',
+        rating: 4.2,
+        keyFeatures: ['Compact Design', 'Wireless', 'Long Battery']
+      }
+    ],
+    accessories: [
+      {
+        id: 36,
+        name: 'Wireless Mouse Pro',
+        price: 2500,
+        image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop',
+        category: 'Accessory',
+        brand: 'TechShop',
+        rating: 4.3,
+        keyFeatures: ['Wireless', 'Ergonomic', 'Precision Sensor']
+      },
+      {
+        id: 37,
+        name: 'USB-C Hub',
+        price: 4500,
+        image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
+        category: 'Accessory',
+        brand: 'TechShop',
+        rating: 4.5,
+        keyFeatures: ['7-in-1 Ports', 'USB-C', 'Compact Design']
+      }
     ]
   };
 
@@ -375,6 +449,9 @@ const Products = () => {
       case 'pcs': return 'All-in-One PCs';
       case 'ups': return 'UPS Systems';
       case 'components': return 'Components';
+      case 'monitors': return 'Monitors';
+      case 'keyboards': return 'Keyboards';
+      case 'accessories': return 'Accessories';
       default: return 'All Products';
     }
   };
@@ -392,6 +469,12 @@ const Products = () => {
         return ['All UPS', 'Home UPS', 'Office UPS', 'Server UPS'];
       case 'components':
         return ['All Components', 'RAM', 'Storage', 'Graphics Cards', 'Processors'];
+      case 'monitors':
+        return ['All Monitors', '27" 4K Monitors', '32" Monitors'];
+      case 'keyboards':
+        return ['All Keyboards', 'Mechanical Keyboards', 'Wireless Keyboards'];
+      case 'accessories':
+        return ['All Accessories', 'Mouse Pro', 'USB-C Hub'];
       default:
         return ['All Categories'];
     }
@@ -449,9 +532,9 @@ const Products = () => {
           <span>{getCategoryTitle()}</span>
         </div>
 
-        <div className="flex gap-8">
-          {/* Sidebar Filters */}
-          <div className="w-80 space-y-6 animate-slide-up">
+        <div className="flex gap-6">
+          {/* Smaller Sidebar Filters */}
+          <div className="w-64 space-y-6 animate-slide-up">
             <div>
               <h3 className="text-lg font-semibold text-stone-900 mb-4">{getCategoryTitle()}</h3>
               <div className="space-y-2">
@@ -459,7 +542,7 @@ const Products = () => {
                   <Button
                     key={category}
                     variant={selectedCategory === category ? "default" : "ghost"}
-                    className={`w-full justify-start transform hover:scale-105 transition-all duration-200 ${
+                    className={`w-full justify-start text-sm transform hover:scale-105 transition-all duration-200 ${
                       selectedCategory === category 
                         ? "bg-stone-200 text-stone-900" 
                         : "text-stone-700 hover:bg-stone-100"
@@ -475,11 +558,11 @@ const Products = () => {
             <div>
               <h4 className="font-medium text-stone-900 mb-4">Filters</h4>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Brand</label>
                   <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                    <SelectTrigger className="w-full hover:scale-105 transform transition-all duration-200">
+                    <SelectTrigger className="w-full text-sm">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
@@ -492,7 +575,7 @@ const Products = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-stone-700 mb-4 block">Price Range</label>
+                  <label className="text-sm font-medium text-stone-700 mb-3 block">Price Range</label>
                   <div className="px-2">
                     <Slider
                       value={priceRange}
@@ -502,7 +585,7 @@ const Products = () => {
                       step={1000}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-sm text-stone-600 mt-2">
+                    <div className="flex justify-between text-xs text-stone-600 mt-2">
                       <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
                       <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                     </div>
@@ -512,7 +595,7 @@ const Products = () => {
                 <div>
                   <label className="text-sm font-medium text-stone-700 mb-2 block">Customer Ratings</label>
                   <Select value={selectedRating} onValueChange={setSelectedRating}>
-                    <SelectTrigger className="w-full hover:scale-105 transform transition-all duration-200">
+                    <SelectTrigger className="w-full text-sm">
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
@@ -531,10 +614,30 @@ const Products = () => {
             <div className="flex items-center justify-between mb-6 animate-fade-in delay-100">
               <h2 className="text-2xl font-bold text-stone-900">Products</h2>
               <div className="flex items-center space-x-4">
+                {/* View Mode Toggle */}
+                <div className="flex items-center space-x-2 border rounded-lg p-1">
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="p-2"
+                  >
+                    <Grid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="p-2"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+                
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium text-stone-700">Sort by:</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-48 hover:scale-105 transform transition-all duration-200">
+                    <SelectTrigger className="w-48">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -555,58 +658,133 @@ const Products = () => {
                 <p className="text-stone-500 mt-2">Try adjusting your filters to see more results.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
                 {filteredProducts.map((product, index) => (
-                  <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-                    <CardContent className="p-0">
-                      <div className="relative">
-                        <Link to={`/product/${product.id}`}>
-                          <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                          </div>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`absolute top-2 right-2 bg-white/80 hover:bg-white transform hover:scale-110 transition-all duration-200 ${
-                            isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
-                          }`}
-                          onClick={() => handleWishlistToggle(product)}
-                        >
-                          <Heart className={`w-4 h-4 transition-all duration-200 ${isInWishlist(product.id) ? 'fill-current scale-110' : ''}`} />
-                        </Button>
-                      </div>
-                      <div className="p-4">
-                        <Link to={`/product/${product.id}`}>
-                          <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
-                        </Link>
-                        <div className="flex items-center mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <span
-                              key={i}
-                              className={`text-sm transition-colors duration-200 ${
-                                i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
-                              }`}
-                            >
-                              ★
-                            </span>
-                          ))}
-                          <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+                  viewMode === 'grid' ? (
+                    // Grid View
+                    <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-stone-200 transform hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                      <CardContent className="p-0">
+                        <div className="relative">
+                          <Link to={`/product/${product.id}`}>
+                            <div className="aspect-square overflow-hidden rounded-t-lg bg-stone-100">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                            </div>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`absolute top-2 right-2 bg-white/80 hover:bg-white transform hover:scale-110 transition-all duration-200 ${
+                              isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
+                            }`}
+                            onClick={() => handleWishlistToggle(product)}
+                          >
+                            <Heart className={`w-4 h-4 transition-all duration-200 ${isInWishlist(product.id) ? 'fill-current scale-110' : ''}`} />
+                          </Button>
                         </div>
-                        <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
-                        <Button 
-                          onClick={() => handleAddToCart(product)}
-                          className="w-full bg-red-600 hover:bg-red-700 text-white transform hover:scale-105 transition-all duration-200"
-                        >
-                          Add to Cart
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <div className="p-4">
+                          <Link to={`/product/${product.id}`}>
+                            <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
+                          </Link>
+                          <div className="flex items-center mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <span
+                                key={i}
+                                className={`text-sm transition-colors duration-200 ${
+                                  i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
+                                }`}
+                              >
+                                ★
+                              </span>
+                            ))}
+                            <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+                          </div>
+                          {/* Key Features */}
+                          <div className="mb-3">
+                            {product.keyFeatures?.map((feature, i) => (
+                              <div key={i} className="text-xs text-stone-600 mb-1">• {feature}</div>
+                            ))}
+                          </div>
+                          <p className="text-lg font-bold text-stone-900 mb-3">₹{product.price.toLocaleString('en-IN')}</p>
+                          <Button 
+                            onClick={() => handleAddToCart(product)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white transform hover:scale-105 transition-all duration-200"
+                          >
+                            Add to Cart
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    // List View
+                    <Card key={product.id} className="group hover:shadow-lg transition-all duration-300 border-stone-200 animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                      <CardContent className="p-0">
+                        <div className="flex items-center p-4 gap-4">
+                          <div className="relative flex-shrink-0">
+                            <Link to={`/product/${product.id}`}>
+                              <div className="w-24 h-24 overflow-hidden rounded-lg bg-stone-100">
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                              </div>
+                            </Link>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <Link to={`/product/${product.id}`}>
+                              <h3 className="font-semibold text-stone-900 mb-1 hover:text-red-600 transition-colors duration-200">{product.name}</h3>
+                            </Link>
+                            <div className="flex items-center mb-2">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`text-sm transition-colors duration-200 ${
+                                    i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                              <span className="ml-1 text-sm text-stone-600">({product.rating})</span>
+                            </div>
+                            {/* Key Features in List View */}
+                            <div className="flex flex-wrap gap-2 mb-2">
+                              {product.keyFeatures?.map((feature, i) => (
+                                <span key={i} className="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">
+                                  {feature}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end space-y-2">
+                            <p className="text-xl font-bold text-stone-900">₹{product.price.toLocaleString('en-IN')}</p>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`${
+                                  isInWishlist(product.id) ? 'text-red-500' : 'text-stone-600'
+                                }`}
+                                onClick={() => handleWishlistToggle(product)}
+                              >
+                                <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+                              </Button>
+                              <Button 
+                                onClick={() => handleAddToCart(product)}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                Add to Cart
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
                 ))}
               </div>
             )}
