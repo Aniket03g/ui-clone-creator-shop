@@ -78,7 +78,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'TechShop',
-        rating: 4.4
+        rating: 4.4,
+        keyFeatures: ['Intel i7 Processor', '16GB RAM', '1TB SSD']
       },
       {
         id: 17,
@@ -87,7 +88,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'Dell',
-        rating: 4.2
+        rating: 4.2,
+        keyFeatures: ['Intel i5 Processor', '8GB RAM', '256GB SSD']
       },
       {
         id: 18,
@@ -96,7 +98,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'HP',
-        rating: 4.1
+        rating: 4.1,
+        keyFeatures: ['AMD Ryzen 5', '8GB RAM', '512GB SSD']
       },
       {
         id: 19,
@@ -105,7 +108,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'Lenovo',
-        rating: 4.6
+        rating: 4.6,
+        keyFeatures: ['Intel i7 Processor', '16GB RAM', '512GB SSD']
       },
       {
         id: 20,
@@ -114,7 +118,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1515343476470-163c97a3c1a3?w=400&h=300&fit=crop',
         category: 'Laptop',
         brand: 'ASUS',
-        rating: 4.0
+        rating: 4.0,
+        keyFeatures: ['Intel i5 Processor', '8GB RAM', '256GB SSD']
       }
     ],
     routers: [
@@ -135,7 +140,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'TechShop',
-        rating: 4.5
+        rating: 4.5,
+        keyFeatures: ['Wi-Fi 6', 'Tri Band', '1800 Mbps']
       },
       {
         id: 11,
@@ -144,7 +150,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1544717440-6d6866c37ef7?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'TechShop',
-        rating: 4.7
+        rating: 4.7,
+        keyFeatures: ['Wi-Fi 6E', 'Quad Band', '3000 Mbps']
       },
       {
         id: 21,
@@ -153,7 +160,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'TP-Link',
-        rating: 4.3
+        rating: 4.3,
+        keyFeatures: ['Wi-Fi 6', 'Dual Band', '1500 Mbps']
       },
       {
         id: 22,
@@ -162,7 +170,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'Netgear',
-        rating: 4.8
+        rating: 4.8,
+        keyFeatures: ['Wi-Fi 6', 'Tri Band', '4800 Mbps']
       },
       {
         id: 23,
@@ -171,7 +180,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',
         category: 'Wi-Fi Router',
         brand: 'D-Link',
-        rating: 4.1
+        rating: 4.1,
+        keyFeatures: ['Wi-Fi 6', 'Dual Band', '1200 Mbps']
       }
     ],
     pcs: [
@@ -182,7 +192,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=400&h=300&fit=crop',
         category: 'All-in-One PC',
         brand: 'TechShop',
-        rating: 4.6
+        rating: 4.6,
+        keyFeatures: ['27" 4K Display', 'Intel i7', '16GB RAM']
       },
       {
         id: 12,
@@ -191,7 +202,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=400&h=300&fit=crop',
         category: 'All-in-One PC',
         brand: 'TechShop',
-        rating: 4.8
+        rating: 4.8,
+        keyFeatures: ['32" 4K Display', 'Intel i9', '32GB RAM']
       },
       {
         id: 24,
@@ -200,7 +212,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop',
         category: 'All-in-One PC',
         brand: 'HP',
-        rating: 4.3
+        rating: 4.3,
+        keyFeatures: ['24" Full HD', 'Intel i5', '8GB RAM']
       },
       {
         id: 25,
@@ -209,7 +222,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1572459443203-55bf9c14e87d?w=400&h=300&fit=crop',
         category: 'All-in-One PC',
         brand: 'Dell',
-        rating: 4.5
+        rating: 4.5,
+        keyFeatures: ['27" Full HD', 'Intel i7', '16GB RAM']
       }
     ],
     ups: [
@@ -220,7 +234,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',
         category: 'UPS System',
         brand: 'TechShop',
-        rating: 4.4
+        rating: 4.4,
+        keyFeatures: ['1000VA Capacity', 'Pure Sine Wave', 'LCD Display']
       },
       {
         id: 13,
@@ -229,7 +244,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=300&fit=crop',
         category: 'UPS System',
         brand: 'TechShop',
-        rating: 4.5
+        rating: 4.5,
+        keyFeatures: ['1500VA Capacity', 'Pure Sine Wave', 'USB Monitoring']
       },
       {
         id: 14,
@@ -238,7 +254,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=400&h=300&fit=crop',
         category: 'UPS System',
         brand: 'TechShop',
-        rating: 4.7
+        rating: 4.7,
+        keyFeatures: ['2000VA Capacity', 'Online UPS', 'Hot Swappable']
       },
       {
         id: 26,
@@ -247,7 +264,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1509909756405-be0199881695?w=400&h=300&fit=crop',
         category: 'UPS System',
         brand: 'APC',
-        rating: 4.6
+        rating: 4.6,
+        keyFeatures: ['1100VA Capacity', 'Battery Backup', '8 Outlets']
       },
       {
         id: 27,
@@ -256,7 +274,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1572459443203-55bf9c14e87d?w=400&h=300&fit=crop',
         category: 'UPS System',
         brand: 'Microtek',
-        rating: 4.2
+        rating: 4.2,
+        keyFeatures: ['800VA Capacity', 'Square Wave', 'Overload Protection']
       }
     ],
     components: [
@@ -267,7 +286,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1555617778-5b5d3d8d5e6b?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'TechShop',
-        rating: 4.3
+        rating: 4.3,
+        keyFeatures: ['16GB Capacity', 'DDR4-3200', 'CL16 Timing']
       },
       {
         id: 16,
@@ -276,7 +296,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'TechShop',
-        rating: 4.5
+        rating: 4.5,
+        keyFeatures: ['1TB Capacity', 'NVMe M.2', '3500MB/s Read']
       },
       {
         id: 28,
@@ -285,7 +306,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'Corsair',
-        rating: 4.7
+        rating: 4.7,
+        keyFeatures: ['32GB Capacity', 'DDR4-3200', 'RGB Lighting']
       },
       {
         id: 29,
@@ -294,7 +316,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'Samsung',
-        rating: 4.8
+        rating: 4.8,
+        keyFeatures: ['2TB Capacity', 'PCIe 4.0', '7000MB/s Read']
       },
       {
         id: 30,
@@ -303,7 +326,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'NVIDIA',
-        rating: 4.9
+        rating: 4.9,
+        keyFeatures: ['8GB GDDR6', 'Ray Tracing', 'DLSS 3.0']
       },
       {
         id: 31,
@@ -312,7 +336,8 @@ const Products = () => {
         image: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=400&h=300&fit=crop',
         category: 'Component',
         brand: 'AMD',
-        rating: 4.6
+        rating: 4.6,
+        keyFeatures: ['8 Cores', '16 Threads', '4.7GHz Boost']
       }
     ],
     monitors: [
@@ -704,7 +729,7 @@ const Products = () => {
                           </div>
                           {/* Key Features */}
                           <div className="mb-3">
-                            {product.keyFeatures?.map((feature, i) => (
+                            {product.keyFeatures && product.keyFeatures.map((feature, i) => (
                               <div key={i} className="text-xs text-stone-600 mb-1">• {feature}</div>
                             ))}
                           </div>
@@ -753,7 +778,7 @@ const Products = () => {
                             </div>
                             {/* Key Features in List View */}
                             <div className="flex flex-wrap gap-2 mb-2">
-                              {product.keyFeatures?.map((feature, i) => (
+                              {product.keyFeatures && product.keyFeatures.map((feature, i) => (
                                 <span key={i} className="text-xs bg-stone-100 text-stone-600 px-2 py-1 rounded">
                                   {feature}
                                 </span>
