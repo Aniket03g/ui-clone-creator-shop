@@ -14,16 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          allow_backorders: string
+          base_price: number
+          brand: string | null
+          capacity_va: number | null
+          capacity_watts: number | null
+          categories: string[] | null
+          created_at: string
+          created_by: string | null
+          delivery_method: string | null
+          display: string | null
+          estimated_runtime: string | null
+          ethernet_ports: number | null
+          frequency_bands: string | null
+          gpu: string | null
+          has_variants: boolean
+          id: string
+          images: string[] | null
+          license_type: string | null
+          long_description: string
+          meta_description: string | null
+          meta_title: string | null
+          operating_system: string | null
+          output_waveform: string | null
+          processor: string | null
+          product_name: string
+          product_type: string
+          ram: string | null
+          sale_price: number | null
+          sku: string
+          speed_data_rate: string | null
+          status: string
+          stock_quantity: number
+          storage: string | null
+          system_requirements: string | null
+          tags: string[] | null
+          updated_at: string
+          url_slug: string
+          wifi_standard: string | null
+        }
+        Insert: {
+          allow_backorders?: string
+          base_price?: number
+          brand?: string | null
+          capacity_va?: number | null
+          capacity_watts?: number | null
+          categories?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          delivery_method?: string | null
+          display?: string | null
+          estimated_runtime?: string | null
+          ethernet_ports?: number | null
+          frequency_bands?: string | null
+          gpu?: string | null
+          has_variants?: boolean
+          id?: string
+          images?: string[] | null
+          license_type?: string | null
+          long_description: string
+          meta_description?: string | null
+          meta_title?: string | null
+          operating_system?: string | null
+          output_waveform?: string | null
+          processor?: string | null
+          product_name: string
+          product_type: string
+          ram?: string | null
+          sale_price?: number | null
+          sku: string
+          speed_data_rate?: string | null
+          status?: string
+          stock_quantity?: number
+          storage?: string | null
+          system_requirements?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url_slug: string
+          wifi_standard?: string | null
+        }
+        Update: {
+          allow_backorders?: string
+          base_price?: number
+          brand?: string | null
+          capacity_va?: number | null
+          capacity_watts?: number | null
+          categories?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          delivery_method?: string | null
+          display?: string | null
+          estimated_runtime?: string | null
+          ethernet_ports?: number | null
+          frequency_bands?: string | null
+          gpu?: string | null
+          has_variants?: boolean
+          id?: string
+          images?: string[] | null
+          license_type?: string | null
+          long_description?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          operating_system?: string | null
+          output_waveform?: string | null
+          processor?: string | null
+          product_name?: string
+          product_type?: string
+          ram?: string | null
+          sale_price?: number | null
+          sku?: string
+          speed_data_rate?: string | null
+          status?: string
+          stock_quantity?: number
+          storage?: string | null
+          system_requirements?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          url_slug?: string
+          wifi_standard?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +329,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
