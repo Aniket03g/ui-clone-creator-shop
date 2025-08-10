@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import AuthDialog from './AuthDialog';
 
 // Updated category data structure focused on tech/hardware
@@ -75,7 +76,8 @@ const categories = {
 const AmazonHeader = () => {
   const { getTotalItems } = useCart();
   const { getTotalWishlistItems } = useWishlist();
-  const { isAuthenticated, user, logout } = useUser();
+  const { isAuthenticated, user: oldUser, logout } = useUser();
+  const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -127,10 +129,10 @@ const AmazonHeader = () => {
   };
 
   const handleAccountClick = () => {
-    if (isAuthenticated) {
+    if (user) {
       navigate('/profile');
     } else {
-      setShowAuthDialog(true);
+      navigate('/auth');
     }
   };
 
@@ -186,18 +188,43 @@ const AmazonHeader = () => {
               {/* Right Side - Account, Wishlist & Cart */}
               <div className="flex items-center space-x-6">
                 {/* Account */}
-                <button 
-                  onClick={handleAccountClick}
-                  className="text-sm hover:text-red-400 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5" />
-                    <div>
-                      <div className="text-xs opacity-90">Hello, {isAuthenticated ? user?.firstName : 'Sign in'}</div>
-                      <div className="font-semibold">Account</div>
+                {user ? (
+                  <div className="relative group">
+                    <button className="text-sm hover:text-red-400 transition-colors cursor-pointer">
+                      <div className="flex items-center space-x-2">
+                        <User className="w-5 h-5" />
+                        <div>
+                          <div className="text-xs opacity-90">Hello, {user.user_metadata?.first_name || user.email?.split('@')[0]}</div>
+                          <div className="font-semibold">Account</div>
+                        </div>
+                      </div>
+                    </button>
+                    <div className="absolute top-full right-0 bg-white border shadow-lg py-2 px-4 text-black text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all rounded">
+                      {isAdmin && (
+                        <Link to="/admin/add-product" className="block py-1 hover:text-red-600 whitespace-nowrap">
+                          Admin Panel
+                        </Link>
+                      )}
+                      <Link to="/profile" className="block py-1 hover:text-red-600">Profile</Link>
+                      <button onClick={signOut} className="block py-1 hover:text-red-600 text-left w-full">
+                        Sign Out
+                      </button>
                     </div>
                   </div>
-                </button>
+                ) : (
+                  <button 
+                    onClick={handleAccountClick}
+                    className="text-sm hover:text-red-400 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <User className="w-5 h-5" />
+                      <div>
+                        <div className="text-xs opacity-90">Hello, Sign in</div>
+                        <div className="font-semibold">Account</div>
+                      </div>
+                    </div>
+                  </button>
+                )}
 
                 {/* Wishlist */}
                 <Link to="/wishlist" className="flex items-center space-x-2 hover:text-red-400 transition-colors relative">

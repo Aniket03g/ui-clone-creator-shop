@@ -7,6 +7,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import { UserProvider } from "@/contexts/UserContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -23,16 +25,18 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Electronics from "./pages/Electronics";
 import AddProduct from "./pages/AddProduct";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <UserProvider>
-      <SearchProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <TooltipProvider>
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <AuthProvider>
+          <SearchProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <TooltipProvider>
               <Toaster />
               <Sonner />
               <BrowserRouter>
@@ -63,17 +67,23 @@ const App = () => (
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/terms" element={<TermsOfService />} />
-                  <Route path="/admin/add-product" element={<AddProduct />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/admin/add-product" element={
+                    <AdminRoute>
+                      <AddProduct />
+                    </AdminRoute>
+                  } />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
-            </TooltipProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </SearchProvider>
-    </UserProvider>
-  </QueryClientProvider>
+                </TooltipProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </SearchProvider>
+        </AuthProvider>
+      </UserProvider>
+    </QueryClientProvider>
 );
 
 export default App;

@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Upload, X, ChevronDown, Plus, ImageIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const productSchema = z.object({
   productType: z.string().min(1, 'Product type is required'),
@@ -93,6 +95,10 @@ export default function AddProduct() {
   const [tagInput, setTagInput] = useState('');
   const [seoExpanded, setSeoExpanded] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { user } = useAuth();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -143,12 +149,106 @@ export default function AddProduct() {
     }
   };
 
-  const onSubmit = (data: ProductFormData) => {
-    console.log('Product data:', { ...data, categories: selectedCategories, tags });
-    toast({
-      title: "Product saved!",
-      description: "Your product has been saved successfully.",
-    });
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            setUploadedImages(prev => [...prev, e.target?.result as string]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const onSubmit = async (data: ProductFormData) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to create products.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const productData = {
+        product_type: data.productType,
+        product_name: data.productName,
+        url_slug: data.urlSlug,
+        long_description: data.longDescription,
+        has_variants: data.hasVariants,
+        base_price: data.basePrice,
+        sale_price: data.salePrice || null,
+        sku: data.sku,
+        stock_quantity: data.stockQuantity,
+        allow_backorders: data.allowBackorders,
+        status: data.status,
+        brand: data.brand || null,
+        meta_title: data.metaTitle || null,
+        meta_description: data.metaDescription || null,
+        categories: selectedCategories,
+        tags: tags,
+        images: uploadedImages,
+        created_by: user.id,
+        // Category-specific fields
+        processor: data.processor || null,
+        ram: data.ram || null,
+        storage: data.storage || null,
+        gpu: data.gpu || null,
+        display: data.display || null,
+        operating_system: data.operatingSystem || null,
+        wifi_standard: data.wifiStandard || null,
+        frequency_bands: data.frequencyBands || null,
+        speed_data_rate: data.speedDataRate || null,
+        ethernet_ports: data.ethernetPorts || null,
+        capacity_va: data.capacityVA || null,
+        capacity_watts: data.capacityWatts || null,
+        output_waveform: data.outputWaveform || null,
+        estimated_runtime: data.estimatedRuntime || null,
+        license_type: data.licenseType || null,
+        delivery_method: data.deliveryMethod || null,
+        system_requirements: data.systemRequirements || null,
+      };
+
+      const { error } = await supabase
+        .from('products')
+        .insert(productData);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Product created successfully!",
+        description: "Your product has been added to the database.",
+      });
+
+      // Reset form
+      form.reset();
+      setTags([]);
+      setSelectedCategories([]);
+      setUploadedImages([]);
+      
+    } catch (error: any) {
+      console.error('Error creating product:', error);
+      toast({
+        title: "Error creating product",
+        description: error.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderCategorySpecificFields = () => {
@@ -508,7 +608,68 @@ export default function AddProduct() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Card 1: Core Information */}
+                {/* Card 1: Product Images */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Product Images</CardTitle>
+                    <CardDescription>Upload images for your product</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Upload Images</Label>
+                      <div className="mt-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors flex flex-col items-center"
+                        >
+                          <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                          <div className="mt-4">
+                            <span className="text-sm font-medium">Click to upload images</span>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              PNG, JPG, GIF up to 10MB each
+                            </p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {uploadedImages.length > 0 && (
+                      <div>
+                        <Label className="text-sm font-medium">Uploaded Images ({uploadedImages.length})</Label>
+                        <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {uploadedImages.map((image, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={image}
+                                alt={`Product image ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                onClick={() => removeImage(index)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Card 2: Core Information */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Core Information</CardTitle>
@@ -597,7 +758,7 @@ export default function AddProduct() {
                   </CardContent>
                 </Card>
 
-                {/* Card 2: Product Variants */}
+                {/* Card 3: Product Variants */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Product Variants</CardTitle>
@@ -637,7 +798,7 @@ export default function AddProduct() {
                   </CardContent>
                 </Card>
 
-                {/* Card 3: Pricing & Inventory */}
+                {/* Card 4: Pricing & Inventory */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Pricing & Inventory</CardTitle>
@@ -754,7 +915,7 @@ export default function AddProduct() {
                   </CardContent>
                 </Card>
 
-                {/* Card 4: Category-Specific Attributes */}
+                {/* Card 5: Category-Specific Attributes */}
                 {renderCategorySpecificFields()}
               </div>
 
@@ -790,13 +951,14 @@ export default function AddProduct() {
                     />
 
                     <div className="space-y-2">
-                      <Button type="submit" className="w-full">
-                        {form.watch('status') === 'published' ? 'Update Product' : 'Publish Product'}
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? 'Saving...' : (form.watch('status') === 'published' ? 'Update Product' : 'Publish Product')}
                       </Button>
                       <Button 
                         type="button" 
                         variant="outline" 
                         className="w-full"
+                        disabled={isSubmitting}
                         onClick={() => {
                           form.setValue('status', 'draft');
                           form.handleSubmit(onSubmit)();
@@ -927,45 +1089,6 @@ export default function AddProduct() {
                   </CardContent>
                 </Card>
 
-                {/* Card 3: Product Image */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Product Images</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label className="text-sm font-medium">Featured Image</Label>
-                      <div className="mt-2 border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                        <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-                        <div className="mt-4">
-                          <Button type="button" variant="outline" size="sm">
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload Image
-                          </Button>
-                        </div>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm font-medium">Additional Images</Label>
-                      <div className="mt-2 grid grid-cols-3 gap-2">
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                          <div
-                            key={i}
-                            className="aspect-square border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center"
-                          >
-                            <Button type="button" variant="ghost" size="sm">
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
                 {/* Card 4: SEO */}
                 <Card>
