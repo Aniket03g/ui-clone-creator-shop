@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import Electronics from "./pages/Electronics";
 import AddProduct from "./pages/AddProduct";
 import Auth from "./pages/Auth";
+import UpdatePassword from "./pages/UpdatePassword";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/update-password" element={<UpdatePassword />} />
                   <Route path="/admin/add-product" element={
                     <AdminRoute>
                       <AddProduct />
