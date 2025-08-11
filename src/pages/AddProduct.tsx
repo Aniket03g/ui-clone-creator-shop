@@ -73,21 +73,66 @@ const brands = [
 ];
 
 const categories = [
-  { id: 'electronics', label: 'Electronics', children: [
-    { id: 'computers', label: 'Computers' },
-    { id: 'networking', label: 'Networking' },
-    { id: 'power', label: 'Power & Backup' },
+  { id: 'laptops-and-computers', label: 'Laptops & Computers', children: [
+    { id: 'gaming-laptops', label: 'Gaming Laptops' },
+    { id: 'business-laptops', label: 'Business Laptops' },
+    { id: 'desktop-pcs', label: 'Desktop PCs' },
+    { id: 'all-in-one-pcs', label: 'All-in-One PCs' },
+    { id: '2-in-1-laptops', label: '2-in-1 Laptops' },
+    { id: 'workstations', label: 'Workstations' },
+    { id: 'mini-pcs', label: 'Mini PCs' },
+    { id: 'refurbished-systems', label: 'Refurbished Systems' }
   ]},
-  { id: 'accessories', label: 'Accessories', children: [
-    { id: 'input-devices', label: 'Input Devices' },
-    { id: 'audio', label: 'Audio' },
-    { id: 'displays', label: 'Displays' },
+  { id: 'computer-components', label: 'Computer Components', children: [
+    { id: 'processors-cpus', label: 'Processors (CPUs)' },
+    { id: 'graphics-cards-gpus', label: 'Graphics Cards (GPUs)' },
+    { id: 'memory-ram', label: 'Memory (RAM)' },
+    { id: 'storage-ssd-hdd', label: 'Storage (SSD/HDD)' },
+    { id: 'motherboards', label: 'Motherboards' },
+    { id: 'power-supplies', label: 'Power Supplies' },
+    { id: 'cooling-systems', label: 'Cooling Systems' },
+    { id: 'computer-cases', label: 'Computer Cases' }
   ]},
-  { id: 'software', label: 'Software', children: [
-    { id: 'productivity', label: 'Productivity' },
-    { id: 'security', label: 'Security' },
-    { id: 'development', label: 'Development' },
+  { id: 'networking-and-internet', label: 'Networking & Internet', children: [
+    { id: 'wi-fi-routers', label: 'Wi-Fi Routers' },
+    { id: 'modems', label: 'Modems' },
+    { id: 'network-switches', label: 'Network Switches' },
+    { id: 'access-points', label: 'Access Points' },
+    { id: 'network-cables', label: 'Network Cables' },
+    { id: 'firewalls', label: 'Firewalls' },
+    { id: 'vpn-hardware', label: 'VPN Hardware' },
+    { id: 'mesh-systems', label: 'Mesh Systems' }
   ]},
+  { id: 'power-and-ups', label: 'Power & UPS', children: [
+    { id: 'ups-systems', label: 'UPS Systems' },
+    { id: 'power-strips', label: 'Power Strips' },
+    { id: 'surge-protectors', label: 'Surge Protectors' },
+    { id: 'battery-backups', label: 'Battery Backups' },
+    { id: 'voltage-stabilizers', label: 'Voltage Stabilizers' },
+    { id: 'power-inverters', label: 'Power Inverters' },
+    { id: 'solar-power-systems', label: 'Solar Power Systems' },
+    { id: 'power-cables', label: 'Power Cables' }
+  ]},
+  { id: 'software-and-licenses', label: 'Software & Licenses', children: [
+    { id: 'microsoft-office-365', label: 'Microsoft Office 365' },
+    { id: 'windows-operating-system', label: 'Windows Operating System' },
+    { id: 'antivirus-software', label: 'Antivirus Software' },
+    { id: 'business-software', label: 'Business Software' },
+    { id: 'design-software', label: 'Design Software' },
+    { id: 'development-tools', label: 'Development Tools' },
+    { id: 'productivity-apps', label: 'Productivity Apps' },
+    { id: 'security-software', label: 'Security Software' }
+  ]},
+  { id: 'accessories-and-peripherals', label: 'Accessories & Peripherals', children: [
+    { id: 'keyboards-and-mice', label: 'Keyboards & Mice' },
+    { id: 'monitors-and-displays', label: 'Monitors & Displays' },
+    { id: 'webcams', label: 'Webcams' },
+    { id: 'speakers-and-headsets', label: 'Speakers & Headsets' },
+    { id: 'external-storage', label: 'External Storage' },
+    { id: 'cables-and-adapters', label: 'Cables & Adapters' },
+    { id: 'docking-stations', label: 'Docking Stations' },
+    { id: 'printer-and-scanners', label: 'Printer & Scanners' }
+  ]}
 ];
 
 export default function AddProduct() {
