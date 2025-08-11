@@ -924,49 +924,21 @@ export default function AddProduct() {
                 {/* Card 1: Publish */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Publish</CardTitle>
+                    <CardTitle>Publish Product</CardTitle>
+                    <CardDescription>Make your product live and visible to customers</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="published">Published</SelectItem>
-                              <SelectItem value="draft">Draft</SelectItem>
-                              <SelectItem value="archived">Archived</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="space-y-2">
-                      <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting ? 'Saving...' : (form.watch('status') === 'published' ? 'Update Product' : 'Publish Product')}
-                      </Button>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        className="w-full"
-                        disabled={isSubmitting}
-                        onClick={() => {
-                          form.setValue('status', 'draft');
-                          form.handleSubmit(onSubmit)();
-                        }}
-                      >
-                        Save Draft
-                      </Button>
-                    </div>
+                  <CardContent>
+                    <Button 
+                      type="button" 
+                      className="w-full" 
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        form.setValue('status', 'published');
+                        form.handleSubmit(onSubmit)();
+                      }}
+                    >
+                      {isSubmitting ? 'Publishing...' : 'Publish Product'}
+                    </Button>
                   </CardContent>
                 </Card>
 
