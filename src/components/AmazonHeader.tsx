@@ -185,8 +185,18 @@ const AmazonHeader = () => {
                 </form>
               </div>
 
-              {/* Right Side - Account, Wishlist & Cart */}
+              {/* Right Side - Admin, Account, Wishlist & Cart */}
               <div className="flex items-center space-x-6">
+                {/* Admin Add Product Button */}
+                {isAdmin && (
+                  <Link 
+                    to="/admin/add-product" 
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <span>Add Product</span>
+                  </Link>
+                )}
+
                 {/* Account */}
                 {user ? (
                   <div className="relative group">
