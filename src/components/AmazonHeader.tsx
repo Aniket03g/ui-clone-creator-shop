@@ -119,7 +119,9 @@ const AmazonHeader = () => {
   };
 
   const handleCategoryClick = (category: string) => {
-    navigate(`/${category.toLowerCase().replace(/\s+/g, '-')}`);
+    // Convert category name to URL-friendly slug
+    const slug = category.toLowerCase().replace(/\s+&\s+/g, '-and-').replace(/\s+/g, '-');
+    navigate(`/category/${slug}`);
     setShowMegaMenu(false);
   };
 
