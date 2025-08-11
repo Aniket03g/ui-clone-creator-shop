@@ -27,6 +27,7 @@ import Electronics from "./pages/Electronics";
 import AddProduct from "./pages/AddProduct";
 import Auth from "./pages/Auth";
 import UpdatePassword from "./pages/UpdatePassword";
+import Category from "./pages/Category";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
                   <Route path="/deals" element={<Products />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/category/:slug" element={<Category />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/wishlist" element={<Wishlist />} />

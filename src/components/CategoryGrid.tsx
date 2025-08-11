@@ -7,25 +7,25 @@ const CategoryGrid = () => {
     {
       name: 'Laptops',
       image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=300&fit=crop',
-      link: '/laptops',
+      link: '/category/laptops',
       gradient: 'from-slate-600 to-slate-800'
     },
     {
       name: 'Routers',
       image: 'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=500&h=300&fit=crop',
-      link: '/routers',
+      link: '/category/routers',
       gradient: 'from-blue-600 to-blue-800'
     },
     {
       name: 'Monitors',
       image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=300&fit=crop',
-      link: '/monitors',
+      link: '/category/monitors',
       gradient: 'from-purple-600 to-purple-800'
     },
     {
       name: 'PC Components',
       image: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=500&h=300&fit=crop',
-      link: '/components',
+      link: '/category/pc-components',
       gradient: 'from-green-600 to-green-800'
     }
   ];
