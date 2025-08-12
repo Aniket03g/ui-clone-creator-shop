@@ -226,43 +226,39 @@ export default function AddProduct() {
     setIsSubmitting(true);
     
     try {
+      // Create specifications object from category-specific fields
+      const specifications: Record<string, any> = {};
+      
+      // Add specifications based on category
+      if (data.processor) specifications.processor = data.processor;
+      if (data.ram) specifications.ram = data.ram;
+      if (data.storage) specifications.storage = data.storage;
+      if (data.gpu) specifications.gpu = data.gpu;
+      if (data.display) specifications.display = data.display;
+      if (data.operatingSystem) specifications.operating_system = data.operatingSystem;
+      if (data.wifiStandard) specifications.wifi_standard = data.wifiStandard;
+      if (data.frequencyBands) specifications.frequency_bands = data.frequencyBands;
+      if (data.speedDataRate) specifications.speed_data_rate = data.speedDataRate;
+      if (data.ethernetPorts) specifications.ethernet_ports = data.ethernetPorts;
+      if (data.capacityVA) specifications.capacity_va = data.capacityVA;
+      if (data.capacityWatts) specifications.capacity_watts = data.capacityWatts;
+      if (data.outputWaveform) specifications.output_waveform = data.outputWaveform;
+      if (data.estimatedRuntime) specifications.estimated_runtime = data.estimatedRuntime;
+      if (data.licenseType) specifications.license_type = data.licenseType;
+      if (data.deliveryMethod) specifications.delivery_method = data.deliveryMethod;
+      if (data.systemRequirements) specifications.system_requirements = data.systemRequirements;
+      if (data.brand) specifications.brand = data.brand;
+
       const productData = {
-        product_type: data.productType,
-        product_name: data.productName,
-        url_slug: data.urlSlug,
-        long_description: data.longDescription,
-        has_variants: data.hasVariants,
-        base_price: data.basePrice,
-        sale_price: data.salePrice || null,
+        product_type: data.productType as 'laptop' | 'software' | 'accessory' | 'component' | 'peripheral',
+        name: data.productName,
+        description: data.longDescription,
+        price: data.salePrice || data.basePrice,
         sku: data.sku,
         stock_quantity: data.stockQuantity,
-        allow_backorders: data.allowBackorders,
         status: data.status,
-        brand: data.brand || null,
-        meta_title: data.metaTitle || null,
-        meta_description: data.metaDescription || null,
-        categories: selectedCategories,
-        tags: tags,
         images: uploadedImages,
-        created_by: user.id,
-        // Category-specific fields
-        processor: data.processor || null,
-        ram: data.ram || null,
-        storage: data.storage || null,
-        gpu: data.gpu || null,
-        display: data.display || null,
-        operating_system: data.operatingSystem || null,
-        wifi_standard: data.wifiStandard || null,
-        frequency_bands: data.frequencyBands || null,
-        speed_data_rate: data.speedDataRate || null,
-        ethernet_ports: data.ethernetPorts || null,
-        capacity_va: data.capacityVA || null,
-        capacity_watts: data.capacityWatts || null,
-        output_waveform: data.outputWaveform || null,
-        estimated_runtime: data.estimatedRuntime || null,
-        license_type: data.licenseType || null,
-        delivery_method: data.deliveryMethod || null,
-        system_requirements: data.systemRequirements || null,
+        specifications: specifications,
       };
 
       const { error } = await supabase

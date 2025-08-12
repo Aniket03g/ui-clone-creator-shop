@@ -11,13 +11,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface Product {
   id: string;
-  product_name: string;
-  base_price: number;
-  sale_price?: number;
+  name: string;
+  price: number;
+  description?: string;
   images: string[];
-  categories: string[];
-  brand?: string;
-  url_slug: string;
+  product_type: string;
+  specifications: any;
+  sku?: string;
+  stock_quantity: number;
+  status: string;
 }
 
 const Category = () => {
@@ -26,7 +28,7 @@ const Category = () => {
   const [loading, setLoading] = useState(true);
   const [categoryName, setCategoryName] = useState('');
   const { addToCart } = useCart();
-  const { wishlistItems, addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const Category = () => {
         .from('products')
         .select('*')
         .eq('status', 'published')
-        .contains('categories', [slug]);
+        .eq('product_type', slug as 'laptop' | 'software' | 'accessory' | 'component' | 'peripheral');
 
       if (error) {
         console.error('Error fetching products:', error);
@@ -69,39 +71,40 @@ const Category = () => {
 
   const handleAddToCart = (product: Product) => {
     addToCart({
-      id: parseInt(product.id),
-      name: product.product_name,
-      price: product.sale_price || product.base_price,
-      image: product.images[0] || '',
-      category: categoryName
+      id: parseInt(product.id) || 0,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || '/placeholder.svg',
+      category: product.product_type
     });
+    
     toast({
       title: "Added to Cart",
-      description: `${product.product_name} has been added to your cart.`,
+      description: `${product.name} has been added to your cart.`,
     });
   };
 
   const handleWishlistToggle = (product: Product) => {
-    const productId = parseInt(product.id);
-    const productInWishlist = isInWishlist(productId);
-    
-    if (productInWishlist) {
+    const productId = parseInt(product.id) || 0;
+    const wishlistItem = {
+      id: productId,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || '/placeholder.svg',
+      category: product.product_type
+    };
+
+    if (isInWishlist(productId)) {
       removeFromWishlist(productId);
       toast({
         title: "Removed from Wishlist",
-        description: `${product.product_name} has been removed from your wishlist.`,
+        description: `${product.name} has been removed from your wishlist.`,
       });
     } else {
-      addToWishlist({
-        id: productId,
-        name: product.product_name,
-        price: product.sale_price || product.base_price,
-        image: product.images[0] || '',
-        category: categoryName
-      });
+      addToWishlist(wishlistItem);
       toast({
         title: "Added to Wishlist",
-        description: `${product.product_name} has been added to your wishlist.`,
+        description: `${product.name} has been added to your wishlist.`,
       });
     }
   };
@@ -155,19 +158,19 @@ const Category = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => {
-            const productInWishlist = isInWishlist(parseInt(product.id));
-            const displayPrice = product.sale_price || product.base_price;
+            const productInWishlist = isInWishlist(parseInt(product.id) || 0);
+            const brand = product.specifications?.brand;
             
             return (
               <Card key={product.id} className="group hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                 <CardContent className="p-0">
                   <div className="relative">
-                    <Link to={`/product/${product.url_slug}`}>
+                    <Link to={`/product/${product.id}`}>
                       <div className="aspect-square overflow-hidden bg-gray-100">
                         {product.images[0] ? (
                           <img
                             src={product.images[0]}
-                            alt={product.product_name}
+                            alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
@@ -190,26 +193,21 @@ const Category = () => {
                   </div>
                   
                   <div className="p-4 space-y-3">
-                    <Link to={`/product/${product.url_slug}`}>
+                    <Link to={`/product/${product.id}`}>
                       <h3 className="font-medium text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
-                        {product.product_name}
+                        {product.name}
                       </h3>
                     </Link>
                     
-                    {product.brand && (
-                      <p className="text-sm text-gray-500">{product.brand}</p>
+                    {brand && (
+                      <p className="text-sm text-gray-500">{brand}</p>
                     )}
                     
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col">
                         <span className="text-lg font-bold text-gray-900">
-                          ${displayPrice.toFixed(2)}
+                          ₹{Number(product.price).toLocaleString('en-IN')}
                         </span>
-                        {product.sale_price && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ${product.base_price.toFixed(2)}
-                          </span>
-                        )}
                       </div>
                     </div>
                     

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,279 +8,88 @@ import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
-  // All products data with proper matching IDs
-  const allProducts = {
-    // Laptops
-    1: {
-      id: 1,
-      name: 'TechBook Pro 15',
-      subtitle: '15.6-inch 16GB RAM 512GB SSD Intel Core i7',
-      price: 97425,
-      category: 'Laptop',
-      images: [
-        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Ultra-portable design with premium aluminum construction for durability and style',
-        'High-performance Intel Core i7 processor delivers exceptional speed for multitasking',
-        'Stunning 15.6-inch Full HD display with vibrant colors and sharp detail',
-        '16GB of high-speed DDR4 RAM ensures smooth performance even with demanding applications',
-        '512GB PCIe NVMe SSD provides lightning-fast boot times and file access',
-        'Advanced Intel Xe Graphics for enhanced visual performance and content creation',
-        'All-day battery life up to 10 hours for uninterrupted productivity',
-        'Comprehensive connectivity with USB-C, USB-A, HDMI, and audio ports'
-      ],
-      specifications: {
-        'Display Size': '15.6 inches',
-        'Display Type': 'Full HD IPS Anti-Glare',
-        'Resolution': '1920 x 1080 pixels',
-        'Processor': 'Intel Core i7-1165G7',
-        'Processor Speed': '2.8 GHz (Base), 4.7 GHz (Turbo)',
-        'RAM Size': '16GB DDR4',
-        'Storage': '512GB PCIe NVMe SSD',
-        'Graphics': 'Intel Xe Graphics',
-        'Operating System': 'Windows 11 Home',
-        'Battery Life': 'Up to 10 hours',
-        'Weight': '1.69 kg (3.7 lbs)',
-        'Dimensions': '357.6 x 234 x 17.9 mm',
-        'Wi-Fi': 'Wi-Fi 6 (802.11ax)',
-        'Bluetooth': 'Bluetooth 5.1',
-        'USB Ports': '2x USB-C, 1x USB-A',
-        'HDMI': 'HDMI 2.0',
-        'Webcam': '720p HD with privacy shutter',
-        'Keyboard': 'Backlit chiclet keyboard',
-        'Audio': 'Dolby Audio Premium',
-        'Warranty': '1 year limited warranty'
-      },
-      rating: 4.5,
-      totalReviews: 125
-    },
-    7: {
-      id: 7,
-      name: 'TechBook Air 13',
-      subtitle: '13.3-inch 8GB RAM 256GB SSD Intel Core i5',
-      price: 75325,
-      category: 'Laptop',
-      images: [
-        'https://images.unsplash.com/photo-1541807084-9913014e4c4d?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Ultra-thin and lightweight design perfect for portability',
-        'Reliable Intel Core i5 processor for everyday computing tasks',
-        'Crisp 13.3-inch Retina display with True Tone technology',
-        '8GB unified memory for smooth multitasking',
-        '256GB SSD storage for fast file access and boot times',
-        'All-day battery life up to 15 hours',
-        'Fanless design for silent operation',
-        'Touch ID for secure authentication'
-      ],
-      specifications: {
-        'Display Size': '13.3 inches',
-        'Display Type': 'Retina IPS',
-        'Resolution': '2560 x 1600 pixels',
-        'Processor': 'Intel Core i5-1235U',
-        'Processor Speed': '2.1 GHz (Base), 4.4 GHz (Turbo)',
-        'RAM Size': '8GB unified memory',
-        'Storage': '256GB PCIe NVMe SSD',
-        'Graphics': 'Intel Iris Xe Graphics',
-        'Operating System': 'macOS Monterey',
-        'Battery Life': 'Up to 15 hours',
-        'Weight': '1.29 kg (2.8 lbs)',
-        'Dimensions': '304.1 x 212.4 x 16.1 mm',
-        'Wi-Fi': 'Wi-Fi 6 (802.11ax)',
-        'Bluetooth': 'Bluetooth 5.0',
-        'USB Ports': '2x Thunderbolt/USB 4',
-        'Audio': 'Stereo speakers with wide stereo sound',
-        'Warranty': '1 year limited warranty'
-      },
-      rating: 4.3,
-      totalReviews: 89
-    },
-    // Routers
-    2: {
-      id: 2,
-      name: 'NetLink 6000',
-      subtitle: 'AX1200 Dual-Band Wi-Fi 6 Router',
-      price: 11175,
-      category: 'Router',
-      images: [
-        'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1544717440-6d6866c37ef7?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Next-generation Wi-Fi 6 technology for ultra-fast wireless speeds',
-        'Dual-band connectivity with combined speeds up to 1200 Mbps',
-        '4 high-gain antennas with beamforming for extended coverage',
-        'Advanced security with WPA3 encryption and automatic firmware updates',
-        'Easy setup with mobile app and voice control compatibility',
-        'Supports 50+ connected devices simultaneously',
-        'Gaming accelerator and QoS prioritization for lag-free experience',
-        'Gigabit Ethernet ports for wired connections'
-      ],
-      specifications: {
-        'Wi-Fi Standard': 'Wi-Fi 6 (802.11ax)',
-        'Max Speed': '1200 Mbps (AX1200)',
-        'Frequency Bands': 'Dual-band (2.4GHz, 5GHz)',
-        'Antennas': '4x High-gain external antennas',
-        'Ethernet Ports': '4x Gigabit LAN, 1x Gigabit WAN',
-        'USB Ports': '1x USB 3.0',
-        'Processor': 'Dual-core 1.5GHz ARM',
-        'Memory': '512MB RAM, 128MB Flash',
-        'Security': 'WPA3, WPA2, VPN support',
-        'Coverage': 'Up to 2000 sq ft',
-        'Device Capacity': '50+ devices',
-        'Power': '12V/2A adapter',
-        'Dimensions': '230 x 144 x 35 mm',
-        'Weight': '0.6 kg',
-        'Operating Temperature': '0°C to 40°C',
-        'Warranty': '2 year limited warranty'
-      },
-      rating: 4.4,
-      totalReviews: 156
-    },
-    10: {
-      id: 10,
-      name: 'SpeedLink Pro',
-      subtitle: 'AX1800 Tri-Band Wi-Fi 6 Router',
-      price: 18675,
-      category: 'Router',
-      images: [
-        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1544717440-6d6866c37ef7?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Advanced tri-band Wi-Fi 6 technology for maximum performance',
-        'Combined speeds up to 1800 Mbps across all bands',
-        '6 high-performance antennas with MU-MIMO technology',
-        'Dedicated gaming band for lag-free online gaming',
-        'Built-in VPN server for secure remote access',
-        'Advanced parental controls and guest network',
-        'USB 3.0 port for network storage and printer sharing',
-        'Easy mesh compatibility for whole-home coverage'
-      ],
-      specifications: {
-        'Wi-Fi Standard': 'Wi-Fi 6 (802.11ax)',
-        'Max Speed': '1800 Mbps (AX1800)',
-        'Frequency Bands': 'Tri-band (2.4GHz, 5GHz, 5GHz)',
-        'Antennas': '6x High-performance external antennas',
-        'Ethernet Ports': '4x Gigabit LAN, 1x Gigabit WAN',
-        'USB Ports': '1x USB 3.0, 1x USB 2.0',
-        'Processor': 'Quad-core 1.8GHz ARM',
-        'Memory': '1GB RAM, 256MB Flash',
-        'Security': 'WPA3, WPA2, Built-in VPN',
-        'Coverage': 'Up to 3500 sq ft',
-        'Device Capacity': '100+ devices',
-        'Power': '19V/3A adapter',
-        'Dimensions': '280 x 180 x 50 mm',
-        'Weight': '1.1 kg',
-        'Operating Temperature': '0°C to 40°C',
-        'Warranty': '3 year limited warranty'
-      },
-      rating: 4.5,
-      totalReviews: 203
-    },
-    // PCs
-    3: {
-      id: 3,
-      name: 'VisionDesk 27',
-      subtitle: '27-inch All-in-One PC with 4K Display',
-      price: 134925,
-      category: 'PC',
-      images: [
-        'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Stunning 27-inch 4K UHD display with vibrant colors',
-        'Powerful Intel Core i7 processor for demanding applications',
-        '16GB DDR4 RAM for smooth multitasking performance',
-        '512GB NVMe SSD for lightning-fast storage',
-        'Integrated graphics perfect for creative work',
-        'Wireless keyboard and mouse included',
-        'Multiple connectivity options including USB-C',
-        'Space-saving all-in-one design'
-      ],
-      specifications: {
-        'Display Size': '27 inches',
-        'Display Type': '4K UHD IPS',
-        'Resolution': '3840 x 2160 pixels',
-        'Processor': 'Intel Core i7-12700',
-        'Processor Speed': '2.1 GHz (Base), 4.9 GHz (Turbo)',
-        'RAM Size': '16GB DDR4',
-        'Storage': '512GB PCIe NVMe SSD',
-        'Graphics': 'Intel UHD Graphics 770',
-        'Operating System': 'Windows 11 Home',
-        'Webcam': '1080p HD with privacy shutter',
-        'Audio': 'Stereo speakers with subwoofer',
-        'Connectivity': 'Wi-Fi 6, Bluetooth 5.2',
-        'Ports': '4x USB 3.2, 2x USB-C, HDMI out',
-        'Dimensions': '612 x 518 x 175 mm',
-        'Weight': '8.5 kg',
-        'Warranty': '2 year comprehensive warranty'
-      },
-      rating: 4.6,
-      totalReviews: 78
-    },
-    // UPS
-    4: {
-      id: 4,
-      name: 'PowerGuard 1000',
-      subtitle: '1000VA Line Interactive UPS with LCD Display',
-      price: 18675,
-      category: 'UPS',
-      images: [
-        'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1558618047-fd3c8c5d17d0?w=600&h=400&fit=crop'
-      ],
-      aboutItem: [
-        'Reliable 1000VA capacity for home and small office equipment',
-        'Line interactive technology with automatic voltage regulation',
-        'Clear LCD display showing power status and battery information',
-        'Multiple outlets with surge protection and battery backup',
-        'USB connectivity for automatic shutdown software',
-        'Replaceable battery design for long-term cost savings',
-        'Energy efficient operation with low power consumption',
-        'Audible alarms for power events and low battery warnings'
-      ],
-      specifications: {
-        'Capacity': '1000VA / 600W',
-        'Technology': 'Line Interactive',
-        'Input Voltage': '140V - 300V AC',
-        'Output Voltage': '220V ± 10%',
-        'Battery': '12V 7Ah x 2',
-        'Backup Time': '15-30 minutes (typical load)',
-        'Outlets': '6x outlets (3 with battery backup)',
-        'Display': 'LCD with status indicators',
-        'Connectivity': 'USB port for monitoring',
-        'Transfer Time': '2-6 milliseconds',
-        'Surge Protection': 'Yes, built-in',
-        'Dimensions': '335 x 165 x 190 mm',
-        'Weight': '8.5 kg',
-        'Operating Temperature': '0°C to 40°C',
-        'Warranty': '2 year product, 1 year battery'
-      },
-      rating: 4.4,
-      totalReviews: 134
-    }
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', id)
+          .eq('status', 'published')
+          .maybeSingle();
 
-  const product = allProducts[Number(id)] || allProducts[1];
+        if (error) {
+          console.error('Error fetching product:', error);
+          return;
+        }
+
+        setProduct(data);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="space-y-4">
+                <div className="aspect-[4/3] bg-stone-200 rounded-2xl"></div>
+                <div className="flex space-x-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="w-20 h-20 bg-stone-200 rounded-lg"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="h-8 bg-stone-200 rounded w-3/4"></div>
+                <div className="h-4 bg-stone-200 rounded w-1/2"></div>
+                <div className="h-8 bg-stone-200 rounded w-1/4"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-stone-50">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-stone-900 mb-4">Product Not Found</h1>
+            <p className="text-stone-600 mb-8">The product you're looking for doesn't exist or has been removed.</p>
+            <Link to="/" className="text-red-600 hover:text-red-700 underline">
+              Return to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const relatedProducts = [
     {
@@ -316,7 +125,7 @@ const ProductDetail = () => {
       author: 'Ethan Bennett',
       time: '3 months ago',
       rating: 4,
-      comment: `Great ${product.category.toLowerCase()} for the price. The build quality is solid and it meets all my requirements perfectly.`
+      comment: `Great ${product.product_type} for the price. The build quality is solid and it meets all my requirements perfectly.`
     }
   ];
 
@@ -324,9 +133,9 @@ const ProductDetail = () => {
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
-      image: product.images[0],
-      category: product.category
+      price: Number(product.price),
+      image: product.images?.[0] || '/placeholder.svg',
+      category: product.product_type
     });
     toast({
       title: "Added to Cart",
@@ -345,9 +154,9 @@ const ProductDetail = () => {
       addToWishlist({
         id: product.id,
         name: product.name,
-        price: product.price,
-        image: product.images[0],
-        category: product.category
+        price: Number(product.price),
+        image: product.images?.[0] || '/placeholder.svg',
+        category: product.product_type
       });
       toast({
         title: "Added to Wishlist",
@@ -375,55 +184,42 @@ const ProductDetail = () => {
           <div className="lg:sticky lg:top-8 lg:self-start space-y-4">
             <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100">
               <img
-                src={product.images[selectedImage]}
+                src={product.images?.[selectedImage] || '/placeholder.svg'}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex space-x-4">
-              {product.images.map((image: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`aspect-square w-20 rounded-lg overflow-hidden border-2 ${
-                    selectedImage === index ? 'border-stone-400' : 'border-stone-200'
-                  }`}
-                >
-                  <img
-                    src={image}
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {product.images?.length > 1 && (
+              <div className="flex space-x-4">
+                {product.images.map((image: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`aspect-square w-20 rounded-lg overflow-hidden border-2 ${
+                      selectedImage === index ? 'border-stone-400' : 'border-stone-200'
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info - Scrollable Content */}
           <div className="space-y-8">
             <div>
               <h1 className="text-3xl font-bold text-stone-900 mb-2">{product.name}</h1>
-              <p className="text-stone-600">{product.subtitle}</p>
+              {product.description && (
+                <p className="text-stone-600">{product.description}</p>
+              )}
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <span
-                    key={i}
-                    className={`text-lg ${
-                      i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-stone-300'
-                    }`}
-                  >
-                    ★
-                  </span>
-                ))}
-                <span className="ml-2 text-lg font-bold">{product.rating}</span>
-              </div>
-              <span className="text-stone-600">{product.totalReviews} reviews</span>
-            </div>
-
-            <div className="text-3xl font-bold text-stone-900">₹{product.price.toLocaleString('en-IN')}</div>
+            <div className="text-3xl font-bold text-stone-900">₹{Number(product.price).toLocaleString('en-IN')}</div>
 
             <div className="flex space-x-4">
               <Button 
@@ -484,39 +280,26 @@ const ProductDetail = () => {
               </Card>
             </div>
 
-            {/* About this item Section */}
-            <div className="pt-4">
-              <h2 className="text-2xl font-bold text-stone-900 mb-4">About this item</h2>
-              <Card>
-                <CardContent className="p-6">
-                  <ul className="space-y-3">
-                    {product.aboutItem.map((item: string, index: number) => (
-                      <li key={index} className="flex items-start">
-                        <span className="w-2 h-2 bg-stone-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-stone-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Technical Specifications */}
-            <div className="pt-4">
-              <h2 className="text-2xl font-bold text-stone-900 mb-6">Technical Specifications</h2>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-1 gap-3">
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-3 border-b border-stone-100 last:border-b-0">
-                        <span className="font-medium text-stone-900">{key}</span>
-                        <span className="text-stone-600 text-right ml-4">{String(value)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {product.specifications && Object.keys(product.specifications).length > 0 && (
+              <div className="pt-4">
+                <h2 className="text-2xl font-bold text-stone-900 mb-6">Technical Specifications</h2>
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 gap-3">
+                      {Object.entries(product.specifications as Record<string, any>)
+                        .filter(([_, value]) => value !== null && value !== undefined && value !== '')
+                        .map(([key, value]) => (
+                          <div key={key} className="flex justify-between py-3 border-b border-stone-100 last:border-b-0">
+                            <span className="font-medium text-stone-900">{key}</span>
+                            <span className="text-stone-600 text-right ml-4">{String(value)}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
 
