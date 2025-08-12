@@ -16,124 +16,46 @@ export type Database = {
     Tables: {
       products: {
         Row: {
-          allow_backorders: string
-          base_price: number
-          brand: string | null
-          capacity_va: number | null
-          capacity_watts: number | null
-          categories: string[] | null
           created_at: string
-          created_by: string | null
-          delivery_method: string | null
-          display: string | null
-          estimated_runtime: string | null
-          ethernet_ports: number | null
-          frequency_bands: string | null
-          gpu: string | null
-          has_variants: boolean
+          description: string | null
           id: string
           images: string[] | null
-          license_type: string | null
-          long_description: string
-          meta_description: string | null
-          meta_title: string | null
-          operating_system: string | null
-          output_waveform: string | null
-          processor: string | null
-          product_name: string
-          product_type: string
-          ram: string | null
-          sale_price: number | null
-          sku: string
-          speed_data_rate: string | null
-          status: string
-          stock_quantity: number
-          storage: string | null
-          system_requirements: string | null
-          tags: string[] | null
+          name: string
+          price: number
+          product_type: Database["public"]["Enums"]["product_type_enum"] | null
+          sku: string | null
+          specifications: Json | null
+          status: string | null
+          stock_quantity: number | null
           updated_at: string
-          url_slug: string
-          wifi_standard: string | null
         }
         Insert: {
-          allow_backorders?: string
-          base_price?: number
-          brand?: string | null
-          capacity_va?: number | null
-          capacity_watts?: number | null
-          categories?: string[] | null
           created_at?: string
-          created_by?: string | null
-          delivery_method?: string | null
-          display?: string | null
-          estimated_runtime?: string | null
-          ethernet_ports?: number | null
-          frequency_bands?: string | null
-          gpu?: string | null
-          has_variants?: boolean
+          description?: string | null
           id?: string
           images?: string[] | null
-          license_type?: string | null
-          long_description: string
-          meta_description?: string | null
-          meta_title?: string | null
-          operating_system?: string | null
-          output_waveform?: string | null
-          processor?: string | null
-          product_name: string
-          product_type: string
-          ram?: string | null
-          sale_price?: number | null
-          sku: string
-          speed_data_rate?: string | null
-          status?: string
-          stock_quantity?: number
-          storage?: string | null
-          system_requirements?: string | null
-          tags?: string[] | null
+          name: string
+          price: number
+          product_type?: Database["public"]["Enums"]["product_type_enum"] | null
+          sku?: string | null
+          specifications?: Json | null
+          status?: string | null
+          stock_quantity?: number | null
           updated_at?: string
-          url_slug: string
-          wifi_standard?: string | null
         }
         Update: {
-          allow_backorders?: string
-          base_price?: number
-          brand?: string | null
-          capacity_va?: number | null
-          capacity_watts?: number | null
-          categories?: string[] | null
           created_at?: string
-          created_by?: string | null
-          delivery_method?: string | null
-          display?: string | null
-          estimated_runtime?: string | null
-          ethernet_ports?: number | null
-          frequency_bands?: string | null
-          gpu?: string | null
-          has_variants?: boolean
+          description?: string | null
           id?: string
           images?: string[] | null
-          license_type?: string | null
-          long_description?: string
-          meta_description?: string | null
-          meta_title?: string | null
-          operating_system?: string | null
-          output_waveform?: string | null
-          processor?: string | null
-          product_name?: string
-          product_type?: string
-          ram?: string | null
-          sale_price?: number | null
-          sku?: string
-          speed_data_rate?: string | null
-          status?: string
-          stock_quantity?: number
-          storage?: string | null
-          system_requirements?: string | null
-          tags?: string[] | null
+          name?: string
+          price?: number
+          product_type?: Database["public"]["Enums"]["product_type_enum"] | null
+          sku?: string | null
+          specifications?: Json | null
+          status?: string | null
+          stock_quantity?: number | null
           updated_at?: string
-          url_slug?: string
-          wifi_standard?: string | null
         }
         Relationships: []
       }
@@ -203,6 +125,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      product_type_enum:
+        | "laptop"
+        | "software"
+        | "accessory"
+        | "component"
+        | "peripheral"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -331,6 +259,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      product_type_enum: [
+        "laptop",
+        "software",
+        "accessory",
+        "component",
+        "peripheral",
+      ],
     },
   },
 } as const
