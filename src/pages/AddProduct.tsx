@@ -147,7 +147,7 @@ export default function AddProduct() {
       }
 
       const productData = {
-        product_type: data.product_type,
+        product_type: data.product_type as any, // Type assertion for enum compatibility
         name: data.name,
         description: data.description,
         price: data.price,

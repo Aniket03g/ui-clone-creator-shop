@@ -131,6 +131,12 @@ export type Database = {
         | "accessory"
         | "component"
         | "peripheral"
+        | "router"
+        | "ups"
+        | "monitor"
+        | "keyboard"
+        | "mouse"
+        | "headphones"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -265,6 +271,12 @@ export const Constants = {
         "accessory",
         "component",
         "peripheral",
+        "router",
+        "ups",
+        "monitor",
+        "keyboard",
+        "mouse",
+        "headphones",
       ],
     },
   },
