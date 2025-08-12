@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { Upload, X, ImageIcon } from 'lucide-react';
 
 // Zod schema for form validation
 const productSchema = z.object({
@@ -71,6 +72,8 @@ const productTypes = [
 
 export default function AddProduct() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { user } = useAuth();
 
   const form = useForm<ProductFormData>({
@@ -85,6 +88,82 @@ export default function AddProduct() {
   });
 
   const watchedProductType = form.watch('product_type');
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    
+    try {
+      const imageUrls: string[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: `${file.name} is larger than 5MB. Please choose a smaller file.`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: "Invalid file type",
+            description: `${file.name} is not an image file.`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Generate unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, file);
+
+        if (error) {
+          throw error;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+
+        imageUrls.push(publicUrl);
+      }
+
+      setUploadedImages(prev => [...prev, ...imageUrls]);
+      
+      toast({
+        title: "Images uploaded successfully",
+        description: `${imageUrls.length} image(s) uploaded.`,
+      });
+      
+    } catch (error: any) {
+      console.error('Error uploading images:', error);
+      toast({
+        title: "Error uploading images",
+        description: error.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   const onSubmit = async (data: ProductFormData) => {
     if (!user) {
@@ -155,6 +234,7 @@ export default function AddProduct() {
         stock_quantity: data.stock_quantity,
         status: data.status,
         specifications: specifications,
+        images: uploadedImages,
       };
 
       const { error } = await supabase
@@ -172,6 +252,7 @@ export default function AddProduct() {
 
       // Reset form
       form.reset();
+      setUploadedImages([]);
       
     } catch (error: any) {
       console.error('Error creating product:', error);
@@ -945,6 +1026,95 @@ export default function AddProduct() {
                     </FormItem>
                   )}
                 />
+              </CardContent>
+            </Card>
+
+            {/* Product Images */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Images</CardTitle>
+                <CardDescription>Upload high-quality images of your product</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="mb-4 p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">Image Guidelines:</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• <strong>Format:</strong> JPG, PNG, or WebP</li>
+                      <li>• <strong>Size:</strong> Maximum 5MB per image</li>
+                      <li>• <strong>Dimensions:</strong> Minimum 800x800px, recommended 1200x1200px</li>
+                      <li>• <strong>Background:</strong> White or transparent background preferred</li>
+                      <li>• <strong>Quality:</strong> High-resolution, well-lit, professional photos</li>
+                      <li>• <strong>Multiple angles:</strong> Include front, back, side views for best results</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="image-upload"
+                        disabled={isUploading}
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className={`
+                          border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center cursor-pointer 
+                          hover:border-muted-foreground/50 transition-colors flex flex-col items-center gap-4
+                          ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
+                        `}
+                      >
+                        <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                        <div>
+                          <div className="text-lg font-medium">
+                            {isUploading ? 'Uploading...' : 'Click to upload images'}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Select multiple files to upload at once
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
+                    {uploadedImages.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-3">
+                          Uploaded Images ({uploadedImages.length})
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {uploadedImages.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={imageUrl}
+                                alt={`Product image ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border border-border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                                onClick={() => removeImage(index)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                              <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                                {index === 0 ? 'Main' : `${index + 1}`}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          The first image will be used as the main product image
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
