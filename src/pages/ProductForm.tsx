@@ -28,6 +28,7 @@ const productSchema = z.object({
   product_type: z.enum(['laptop', 'router', 'ups', 'software', 'monitor', 'keyboard', 'mouse', 'headphones', 'all-in-one-pc'], { required_error: "Product type is required." }),
   main_category: z.string({ required_error: "Main category is required." }).min(1, "Main category is required."),
   sub_categories: z.array(z.string()).optional(),
+  images: z.array(z.string()).optional(),
   brand: z.string().optional(),
   cpu: z.string().optional(),
   // ... add all other possible spec fields here as .optional()
@@ -61,7 +62,7 @@ export default function ProductForm() {
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: '', description: '', price: 0, sku: '', stock_quantity: 0, status: 'draft',
-      sub_categories: [], brand: '', cpu: '',
+      sub_categories: [], images: [], brand: '', cpu: '',
     },
   });
 
@@ -69,7 +70,6 @@ export default function ProductForm() {
   const watchedProductType = form.watch('product_type');
 
   useEffect(() => {
-    // Fetches all categories for the dropdowns
     async function fetchAllCategories() {
       setLoadingCategories(true);
       const { data, error } = await supabase.from('categories').select('*');
@@ -84,7 +84,6 @@ export default function ProductForm() {
   }, []);
   
   useEffect(() => {
-    // Updates sub-category options when a main category is selected
     if (watchedMainCategory && allCategories.length > 0) {
       const parent = allCategories.find(cat => cat.slug === watchedMainCategory);
       if (parent) {
@@ -93,22 +92,14 @@ export default function ProductForm() {
     } else {
       setSubCategoryOptions([]);
     }
-    if (form.getValues('main_category') === watchedMainCategory) {
-      form.setValue('sub_categories', []);
-    }
+    if(form.getValues('main_category') === watchedMainCategory) { form.setValue('sub_categories', []); }
   }, [watchedMainCategory, allCategories, form]);
   
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    // ... file validation logic
     const validatedFiles = acceptedFiles
-      .filter(file => {
-        const isValidType = file.type.startsWith('image/');
-        const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
-        if (!isValidType) toast({ title: "Invalid File Type", variant: "destructive" });
-        if (!isValidSize) toast({ title: "File Too Large", description: "Max size is 5MB.", variant: "destructive" });
-        return isValidType && isValidSize;
-      })
+      .filter(file => file.size <= 5 * 1024 * 1024)
       .map(file => Object.assign({ file, preview: URL.createObjectURL(file) }));
-    
     setImageFiles(prev => [...prev, ...validatedFiles]);
   }, []);
 
@@ -117,7 +108,7 @@ export default function ProductForm() {
   const removeImage = (index: number) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
-
+  
   const onSubmit = async (data: ProductFormData) => {
     setIsSubmitting(true);
     setIsUploading(true);
@@ -143,12 +134,7 @@ export default function ProductForm() {
     const finalCategories = [...(data.main_category ? [data.main_category] : []), ...(data.sub_categories || [])];
     const { name, description, price, sku, stock_quantity, status, product_type, main_category, sub_categories, ...specifications } = data;
 
-    const productPayload = {
-      name, description, price, sku, stock_quantity, status, product_type,
-      categories: finalCategories,
-      specifications,
-      images: uploadedImageUrls,
-    };
+    const productPayload = { name, description, price, sku, stock_quantity, status, product_type, categories: finalCategories, specifications, images: uploadedImageUrls };
 
     const { error } = isEditMode
       ? await supabase.from('products').update(productPayload).eq('id', id)
@@ -163,107 +149,35 @@ export default function ProductForm() {
     setIsSubmitting(false);
   };
   
-  const onValidationErrors = (errors: any) => {
-    console.error("Form Validation Failed:", errors);
-    toast({ title: "Validation Error", description: "Please check all required fields.", variant: "destructive"});
-  };
+  const onValidationErrors = (errors: any) => { console.error("Validation Errors:", errors); toast({ title: "Validation Error", description: "Please check all required fields.", variant: "destructive"}); };
   
   const renderSpecificationFields = () => { /* ... Your full switch statement for specs goes here ... */ };
 
   return (
     <div className="container mx-auto py-10">
       <h2 className="text-2xl font-bold tracking-tight">{isEditMode ? 'Edit Product' : 'Add New Product'}</h2>
-      <p className="text-muted-foreground">{isEditMode ? 'Update product details.' : 'Fill in the details for a new product.'}</p>
+      <p className="text-muted-foreground">{isEditMode ? 'Update details.' : 'Fill in details for a new product.'}</p>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit, onValidationErrors)} className="space-y-8 mt-6">
           
           <Card>
-            <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem><FormLabel>Product Name *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="sku" render={({ field }) => (
-                  <FormItem><FormLabel>SKU *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem><FormLabel>Description *</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField control={form.control} name="price" render={({ field }) => (
-                    <FormItem><FormLabel>Price *</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="stock_quantity" render={({ field }) => (
-                    <FormItem><FormLabel>Stock Quantity *</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <FormField control={form.control} name="status" render={({ field }) => (
-                    <FormItem><FormLabel>Status *</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="draft">Draft</SelectItem><SelectItem value="published">Published</SelectItem></SelectContent></Select><FormMessage /></FormItem>
-                  )} />
-                </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Categorization</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.control} name="product_type" render={({ field }) => (
-                <FormItem><FormLabel>Product Type *</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select product type" /></SelectTrigger></FormControl><SelectContent>{productTypes.map(type => (<SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>
-              )} />
-              <FormField control={form.control} name="main_category" render={({ field }) => (
-                <FormItem><FormLabel>Main Category *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ''}><FormControl>
-                      <SelectTrigger disabled={loadingCategories}><SelectValue placeholder={loadingCategories ? "Loading..." : "Select a main category"} /></SelectTrigger>
-                  </FormControl><SelectContent>
-                      {mainCategoryOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
-                  </SelectContent></Select><FormMessage />
-                </FormItem>
-              )} />
-              <div className="md:col-span-2">
-                <FormField control={form.control} name="sub_categories" render={({ field }) => (
-                  <FormItem><FormLabel>Sub-Categories</FormLabel><Popover><PopoverTrigger asChild>
-                    <FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between font-normal", !field.value?.length && "text-muted-foreground")} disabled={!watchedMainCategory || subCategoryOptions.length === 0}>
-                        {field.value?.length ? subCategoryOptions.filter(opt => field.value?.includes(opt.value)).map(opt => opt.label).join(', ') : "Select sub-categories"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button></FormControl>
-                  </PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                    <Command><CommandInput placeholder="Search..." /><CommandEmpty>No sub-category found.</CommandEmpty><CommandList><CommandGroup>
-                      {subCategoryOptions.map(option => (
-                        <CommandItem key={option.value} onSelect={() => {
-                          const selected = field.value || [];
-                          const isSelected = selected.includes(option.value);
-                          field.onChange(isSelected ? selected.filter(s => s !== option.value) : [...selected, option.value]);
-                        }}>
-                          <Check className={cn("mr-2 h-4 w-4", (field.value || []).includes(option.value) ? "opacity-100" : "opacity-0")} />
-                          {option.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup></CommandList></Command>
-                  </PopoverContent></Popover><FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Product Images</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Product Images</CardTitle><CardDescription>Upload product images (Max 5MB each).</CardDescription></CardHeader>
             <CardContent>
               <div {...getRootProps()} className={cn("border-2 border-dashed rounded-lg p-12 text-center cursor-pointer", isDragActive && "border-primary bg-primary/10")}>
                 <input {...getInputProps()} />
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <Upload className="h-10 w-10 text-muted-foreground" />
                   <p className="text-muted-foreground">Drag & drop files here, or click to select</p>
-                  <p className="text-xs text-muted-foreground">PNG, JPG, WEBP up to 5MB</p>
                 </div>
               </div>
               {imageFiles.length > 0 && (
                 <div className="mt-4"><h4 className="text-sm font-medium mb-2">Image Previews:</h4>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
                     {imageFiles.map((image, index) => (
                       <div key={index} className="relative group">
                         <img src={image.preview} alt={image.file.name} className="h-24 w-full object-cover rounded-md" />
-                        <button type="button" onClick={() => removeImage(index)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" onClick={() => removeImage(index)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100">
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -271,6 +185,33 @@ export default function ProductForm() {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="name" render={({ field }) => (<FormItem><FormLabel>Product Name *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="sku" render={({ field }) => (<FormItem><FormLabel>SKU *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+              </div>
+              <FormField control={form.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description *</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField control={form.control} name="price" render={({ field }) => (<FormItem><FormLabel>Price *</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="stock_quantity" render={({ field }) => (<FormItem><FormLabel>Stock Quantity *</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <FormField control={form.control} name="status" render={({ field }) => (<FormItem><FormLabel>Status *</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="draft">Draft</SelectItem><SelectItem value="published">Published</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Categorization</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField control={form.control} name="product_type" render={({ field }) => (<FormItem><FormLabel>Product Type *</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select product type" /></SelectTrigger></FormControl><SelectContent>{productTypes.map(type => (<SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)} />
+              <FormField control={form.control} name="main_category" render={({ field }) => (<FormItem><FormLabel>Main Category *</FormLabel><Select onValueChange={field.onChange} value={field.value || ''}><FormControl><SelectTrigger disabled={loadingCategories}><SelectValue placeholder={loadingCategories ? "Loading..." : "Select a main category"} /></SelectTrigger></FormControl><SelectContent>{mainCategoryOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
+              <div className="md:col-span-2">
+                <FormField control={form.control} name="sub_categories" render={({ field }) => (<FormItem><FormLabel>Sub-Categories</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant="outline" role="combobox" className={cn("w-full justify-between font-normal", !field.value?.length && "text-muted-foreground")} disabled={!watchedMainCategory || subCategoryOptions.length === 0}>{field.value?.length ? subCategoryOptions.filter(opt => field.value?.includes(opt.value)).map(opt => opt.label).join(', ') : "Select sub-categories"}<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-[--radix-popover-trigger-width] p-0"><Command><CommandInput placeholder="Search..." /><CommandEmpty>No sub-category found.</CommandEmpty><CommandList><CommandGroup>{subCategoryOptions.map(option => (<CommandItem key={option.value} onSelect={() => {const selected = field.value || []; const isSelected = selected.includes(option.value); field.onChange(isSelected ? selected.filter(s => s !== option.value) : [...selected, option.value]);}}><Check className={cn("mr-2 h-4 w-4", (field.value || []).includes(option.value) ? "opacity-100" : "opacity-0")} />{option.label}</CommandItem>))}</CommandGroup></CommandList></Command></PopoverContent></Popover><FormMessage /></FormItem>)} />
+              </div>
             </CardContent>
           </Card>
 
