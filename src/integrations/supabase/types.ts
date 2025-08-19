@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          parent_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          parent_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          parent_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       products: {
         Row: {
           created_at: string

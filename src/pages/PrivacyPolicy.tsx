@@ -1,11 +1,9 @@
 
-import Header from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">

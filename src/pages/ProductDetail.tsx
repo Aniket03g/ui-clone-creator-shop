@@ -3,12 +3,74 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart } from 'lucide-react';
-import Header from '@/components/Header';
+import { Heart, Edit } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+
+const specLabelMap: Record<string, string> = {
+  cpu: 'CPU',
+  gpu: 'GPU',
+  ram_gb: 'RAM (GB)',
+  storage_gb: 'Storage (GB)',
+  display_size_inches: 'Display Size (inches)',
+  operating_system: 'Operating System',
+  wifi_standard: 'Wi‑Fi Standard',
+  frequency_bands: 'Frequency Bands',
+  speed_data_rate: 'Speed/Data Rate',
+  ethernet_ports: 'Ethernet Ports',
+  capacity_va: 'Capacity (VA)',
+  capacity_watts: 'Capacity (Watts)',
+  output_waveform: 'Output Waveform',
+  estimated_runtime_minutes: 'Estimated Runtime (minutes)',
+  license_type: 'License Type',
+  delivery_method: 'Delivery Method',
+  system_requirements: 'System Requirements',
+  screen_size_inches: 'Screen Size (inches)',
+  resolution: 'Resolution',
+  refresh_rate_hz: 'Refresh Rate (Hz)',
+  panel_type: 'Panel Type',
+  key_switch_type: 'Key Switch Type',
+  layout: 'Layout',
+  connectivity: 'Connectivity',
+  backlight: 'Backlight',
+  sensor_type: 'Sensor Type',
+  max_dpi: 'Max DPI',
+  number_of_buttons: 'Number of Buttons',
+  driver_type: 'Driver Type',
+  noise_cancellation: 'Noise Cancellation',
+  has_microphone: 'Has Microphone',
+  brand: 'Brand',
+  color: 'Color',
+  weight_kg: 'Weight (kg)',
+  dimensions: 'Dimensions',
+  camera: 'Camera',
+  audio: 'Audio',
+  keyboard: 'Keyboard',
+  ports: 'Ports',
+  battery: 'Battery',
+};
+
+const formatSpecLabel = (key: string): string => {
+  if (specLabelMap[key]) return specLabelMap[key];
+  const pretty = key
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  return pretty
+    .replace(/\bGb\b/g, 'GB')
+    .replace(/\bMb\b/g, 'MB')
+    .replace(/\bHz\b/g, 'Hz')
+    .replace(/\bVa\b/g, 'VA')
+    .replace(/\bDpi\b/g, 'DPI');
+};
+
+const formatSpecValue = (value: any): string => {
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  return String(value);
+};
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -17,6 +79,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,24 +112,21 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="space-y-4">
-                <div className="aspect-[4/3] bg-stone-200 rounded-2xl"></div>
-                <div className="flex space-x-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="w-20 h-20 bg-stone-200 rounded-lg"></div>
-                  ))}
-                </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="space-y-4">
+              <div className="aspect-[4/3] bg-stone-200 rounded-2xl"></div>
+              <div className="flex space-x-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="w-20 h-20 bg-stone-200 rounded-lg"></div>
+                ))}
               </div>
-              <div className="space-y-4">
-                <div className="h-8 bg-stone-200 rounded w-3/4"></div>
-                <div className="h-4 bg-stone-200 rounded w-1/2"></div>
-                <div className="h-8 bg-stone-200 rounded w-1/4"></div>
-              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="h-8 bg-stone-200 rounded w-3/4"></div>
+              <div className="h-4 bg-stone-200 rounded w-1/2"></div>
+              <div className="h-8 bg-stone-200 rounded w-1/4"></div>
             </div>
           </div>
         </div>
@@ -76,16 +136,13 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-stone-50">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-stone-900 mb-4">Product Not Found</h1>
-            <p className="text-stone-600 mb-8">The product you're looking for doesn't exist or has been removed.</p>
-            <Link to="/" className="text-red-600 hover:text-red-700 underline">
-              Return to Home
-            </Link>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-stone-900 mb-4">Product Not Found</h1>
+          <p className="text-stone-600 mb-8">The product you're looking for doesn't exist or has been removed.</p>
+          <Link to="/" className="text-red-600 hover:text-red-700 underline">
+            Return to Home
+          </Link>
         </div>
       </div>
     );
@@ -166,17 +223,25 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <Header />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">
-          <Link to="/" className="text-red-600 hover:scale-105 transition-transform duration-200">Home</Link>
-          <span>/</span>
-          <Link to="/store" className="text-red-600 hover:scale-105 transition-transform duration-200">Store</Link>
-          <span>/</span>
-          <span>{product.name}</span>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-2 text-sm text-stone-600">
+            <Link to="/" className="text-red-600 hover:scale-105 transition-transform duration-200">Home</Link>
+            <span>/</span>
+            <Link to="/store" className="text-red-600 hover:scale-105 transition-transform duration-200">Store</Link>
+            <span>/</span>
+            <span>{product.name}</span>
+          </div>
+          
+          {/* Admin Indicator */}
+          {isAdmin && (
+            <div className="flex items-center space-x-2">
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">
+                🔒 Admin Mode
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
@@ -238,6 +303,24 @@ const ProductDetail = () => {
               </Button>
             </div>
 
+            {/* Admin Edit Button */}
+            {isAdmin && product && (
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-blue-600 font-medium">🔒 Admin Only</span>
+                </div>
+                <Link to={`/admin/edit-product/${product.id}`}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 transition-colors"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Product
+                  </Button>
+                </Link>
+              </div>
+            )}
+
             {/* Return Policy Section */}
             <div className="pt-4">
               <h2 className="text-2xl font-bold text-stone-900 mb-4">Return Policy</h2>
@@ -286,13 +369,19 @@ const ProductDetail = () => {
                 <h2 className="text-2xl font-bold text-stone-900 mb-6">Technical Specifications</h2>
                 <Card>
                   <CardContent className="p-6">
-                    <div className="grid grid-cols-1 gap-3">
-                      {Object.entries(product.specifications as Record<string, any>)
+                    {/* Two-column grid: labels left, values right, aligned neatly */}
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-x-6">
+                      {(Object.entries(product.specifications as Record<string, any>)
                         .filter(([_, value]) => value !== null && value !== undefined && value !== '')
-                        .map(([key, value]) => (
-                          <div key={key} className="flex justify-between py-3 border-b border-stone-100 last:border-b-0">
-                            <span className="font-medium text-stone-900">{key}</span>
-                            <span className="text-stone-600 text-right ml-4">{String(value)}</span>
+                        .map(([key, value]) => ({ key, value: formatSpecValue(value) })))
+                        .map(({ key, value }) => (
+                          <div key={key} className="sm:col-span-12 grid grid-cols-1 sm:grid-cols-12 py-3 border-b border-stone-100 last:border-b-0">
+                            <div className="sm:col-span-4 pr-4 font-medium text-stone-900 break-words">
+                              {formatSpecLabel(key)}
+                            </div>
+                            <div className="sm:col-span-8 text-stone-700 break-words">
+                              {value}
+                            </div>
                           </div>
                         ))}
                     </div>
@@ -368,7 +457,6 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

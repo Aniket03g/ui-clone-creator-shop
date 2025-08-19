@@ -22,49 +22,149 @@ interface Product {
   status: string;
 }
 
+// Updated category mappings covering all routes and product types
+const mainCategoryMappings: Record<string, string[]> = {
+  'laptops-and-computers': ['laptop', 'monitor', 'peripheral'],
+  'computer-components': ['component'],
+  'networking-and-internet': ['router'],
+  'power-and-ups': ['ups'],
+  'software-and-licenses': ['software'],
+  'accessories-and-peripherals': ['accessory', 'keyboard', 'mouse', 'headphones'],
+  // Existing routes
+  'laptops': ['laptop'],
+  'routers': ['router'],
+  'monitors': ['monitor'],
+  'keyboards': ['keyboard'],
+  'mice': ['mouse'],
+  'headphones': ['headphones'],
+  'pcs': ['component'],
+  'electronics': ['laptop', 'monitor', 'router', 'ups', 'keyboard', 'mouse', 'headphones', 'component', 'peripheral']
+};
+
+// This maps URL slugs to display names
+const categoryDisplayNames: Record<string, string> = {
+  'laptops': 'Laptops',
+  'monitors': 'Monitors',
+  'routers': 'Routers',
+  'ups': 'UPS Systems',
+  'software': 'Software',
+  'keyboards': 'Keyboards',
+  'mice': 'Mice',
+  'headphones': 'Headphones'
+};
+
+// Helper function to convert slug to display name
+const slugToTitle = (slug: string) => {
+  // First try to get from display names mapping
+  if (categoryDisplayNames[slug]) {
+    return categoryDisplayNames[slug];
+  }
+  // Fallback to title case conversion
+  return slug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 const Category = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: pathSlug } = useParams<{ slug?: string }>();
+  
+  // Get the current path to handle direct category URLs
+  const currentPath = window.location.pathname;
+  // Extract the slug from the path (e.g., '/laptops' -> 'laptops')
+  const slug = pathSlug || currentPath.split('/').filter(Boolean)[0] || '';
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categoryName, setCategoryName] = useState('');
+  const [categoryName, setCategoryName] = useState(slugToTitle(slug));
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
+  console.log('URL processing:', { 
+    pathSlug, 
+    currentPath, 
+    extractedSlug: slug 
+  });
+
   useEffect(() => {
+    console.log('Category component mounted or slug changed:', { slug });
     if (slug) {
-      fetchProducts();
+      console.log('Fetching products for slug:', slug);
+      fetchProducts().catch(error => {
+        console.error('Error in fetchProducts:', error);
+        toast({
+          title: "Error",
+          description: `Failed to load products: ${error.message}`,
+          variant: "destructive",
+        });
+      });
+    } else {
+      console.warn('No slug provided in URL');
     }
   }, [slug]);
 
   const fetchProducts = async () => {
-    if (!slug) return;
+    if (!slug) {
+      const errorMsg = 'No slug provided in URL';
+      console.error(errorMsg);
+      throw new Error(errorMsg);
+    }
 
+    console.group('Fetching Products');
+    console.log('Current slug:', slug);
+    console.log('Available mappings:', Object.keys(mainCategoryMappings));
+    
     setLoading(true);
+    
     try {
+      // Get the product types for the current category slug
+      const productTypes = mainCategoryMappings[slug as keyof typeof mainCategoryMappings] || [];
+      console.log('Mapped product types for category:', { slug, productTypes });
+
+      if (productTypes.length === 0) {
+        console.warn(`No product types mapped for slug: ${slug}`);
+        setProducts([]);
+        setCategoryName(slugToTitle(slug));
+        return;
+      }
+
+      console.log('Executing Supabase query with server-side filtering...');
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('status', 'published')
-        .eq('product_type', slug as 'laptop' | 'software' | 'accessory' | 'component' | 'peripheral');
+        .in('product_type', productTypes);
 
       if (error) {
-        console.error('Error fetching products:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load products",
-          variant: "destructive",
-        });
-      } else {
-        setProducts(data || []);
-        // Convert slug back to readable category name
-        setCategoryName(slug.split('-').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' '));
+        console.error('Supabase query error:', error);
+        throw new Error(`Error fetching products: ${error.message}`);
+      }
+
+      setProducts(data || []);
+      setCategoryName(slugToTitle(slug));
+      
+      if (!data || data.length === 0) {
+        console.warn('No products returned for this category');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error in fetchProducts:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      toast({
+        title: "Error",
+        description: `Failed to load products: ${errorMessage}`,
+        variant: "destructive",
+      });
+      
+      // Log additional context for debugging
+      console.error('Error context:', {
+        error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        slug,
+        timestamp: new Date().toISOString()
+      });
     } finally {
+      console.groupEnd();
       setLoading(false);
     }
   };
@@ -149,8 +249,8 @@ const Category = () => {
 
       {products.length === 0 ? (
         <div className="text-center py-12">
-          <h3 className="text-xl font-medium text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500 mb-4">We couldn't find any products in this category.</p>
+          <h3 className="text-xl font-medium text-gray-900 mb-2">There are no products in this category yet.</h3>
+          <p className="text-gray-500 mb-4">Please check back later or explore other categories.</p>
           <Link to="/">
             <Button>Continue Shopping</Button>
           </Link>

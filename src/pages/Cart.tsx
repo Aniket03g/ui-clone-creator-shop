@@ -2,7 +2,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 
 const Cart = () => {
@@ -15,7 +14,6 @@ const Cart = () => {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-stone-50">
-        <Header />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <h1 className="text-3xl font-bold text-stone-900 mb-4">Your Cart is Empty</h1>
@@ -33,7 +31,6 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}

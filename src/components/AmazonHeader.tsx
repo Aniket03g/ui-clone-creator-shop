@@ -1,77 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, User, Search, Menu, ChevronDown, Heart } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, ChevronDown, Heart, Settings } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useUser } from '@/contexts/UserContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthDialog from './AuthDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-// Updated category data structure focused on tech/hardware
-const categories = {
-  'Laptops & Computers': [
-    'Gaming Laptops',
-    'Business Laptops',
-    'Desktop PCs',
-    'All-in-One PCs',
-    '2-in-1 Laptops',
-    'Workstations',
-    'Mini PCs',
-    'Refurbished Systems'
-  ],
-  'Computer Components': [
-    'Processors (CPUs)',
-    'Graphics Cards (GPUs)',
-    'Memory (RAM)',
-    'Storage (SSD/HDD)',
-    'Motherboards',
-    'Power Supplies',
-    'Cooling Systems',
-    'Computer Cases'
-  ],
-  'Networking & Internet': [
-    'Wi-Fi Routers',
-    'Modems',
-    'Network Switches',
-    'Access Points',
-    'Network Cables',
-    'Firewalls',
-    'VPN Hardware',
-    'Mesh Systems'
-  ],
-  'Power & UPS': [
-    'UPS Systems',
-    'Power Strips',
-    'Surge Protectors',
-    'Battery Backups',
-    'Voltage Stabilizers',
-    'Power Inverters',
-    'Solar Power Systems',
-    'Power Cables'
-  ],
-  'Software & Licenses': [
-    'Microsoft Office 365',
-    'Windows Operating System',
-    'Antivirus Software',
-    'Business Software',
-    'Design Software',
-    'Development Tools',
-    'Productivity Apps',
-    'Security Software'
-  ],
-  'Accessories & Peripherals': [
-    'Keyboards & Mice',
-    'Monitors & Displays',
-    'Webcams',
-    'Speakers & Headsets',
-    'External Storage',
-    'Cables & Adapters',
-    'Docking Stations',
-    'Printer & Scanners'
-  ]
-};
+// Category interface
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Organized categories structure
+interface CategoryMap {
+  [key: string]: Category[];
+}
 
 const AmazonHeader = () => {
   const { getTotalItems } = useCart();
@@ -83,14 +36,61 @@ const AmazonHeader = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCategory, setSearchCategory] = useState('All');
   const [showMegaMenu, setShowMegaMenu] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('Laptops & Computers');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryMap, setCategoryMap] = useState<CategoryMap>({});
+  const [activeCategory, setActiveCategory] = useState('');
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const allButtonRef = useRef<HTMLButtonElement>(null);
   
   const totalItems = getTotalItems();
   const totalWishlistItems = getTotalWishlistItems();
+
+  // Fetch categories from Supabase
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name');
+          
+        if (error) {
+          console.error('Error fetching categories:', error);
+          return;
+        }
+        
+        if (data) {
+          setCategories(data);
+          
+          // Organize categories by parent_id
+          const mainCategories = data.filter(cat => cat.parent_id === null);
+          const categoriesObj: CategoryMap = {};
+          
+          mainCategories.forEach(mainCat => {
+            const subcategories = data.filter(cat => cat.parent_id === mainCat.id);
+            categoriesObj[mainCat.name] = subcategories;
+          });
+          
+          setCategoryMap(categoriesObj);
+          
+          // Set active category to first main category if available
+          if (mainCategories.length > 0) {
+            setActiveCategory(mainCategories[0].name);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
 
   // Handle mouse enter/leave for mega menu
   useEffect(() => {
@@ -118,15 +118,13 @@ const AmazonHeader = () => {
     }
   };
 
-  const handleCategoryClick = (category: string) => {
-    // Convert category name to URL-friendly slug
-    const slug = category.toLowerCase().replace(/\s+&\s+/g, '-and-').replace(/\s+/g, '-');
-    navigate(`/category/${slug}`);
+  const handleCategoryClick = (category: Category) => {
+    navigate(`/category/${category.slug}`);
     setShowMegaMenu(false);
   };
 
-  const handleSubcategoryClick = (subcategory: string) => {
-    navigate(`/search?q=${encodeURIComponent(subcategory)}`);
+  const handleSubcategoryClick = (subcategory: Category) => {
+    navigate(`/category/${subcategory.slug}`);
     setShowMegaMenu(false);
   };
 
@@ -161,7 +159,7 @@ const AmazonHeader = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-white border border-stone-300 shadow-xl">
                         <SelectItem value="All">All</SelectItem>
-                        {Object.keys(categories).map(category => (
+                        {Object.keys(categoryMap).map(category => (
                           <SelectItem key={category} value={category}>{category}</SelectItem>
                         ))}
                       </SelectContent>
@@ -189,14 +187,35 @@ const AmazonHeader = () => {
 
               {/* Right Side - Admin, Account, Wishlist & Cart */}
               <div className="flex items-center space-x-6">
-                {/* Admin Add Product Button */}
+                {/* Admin Manage Button */}
                 {isAdmin && (
-                  <Link 
-                    to="/admin/add-product" 
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-                  >
-                    <span>Add Product</span>
-                  </Link>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+                      >
+                        <Settings className="w-4 h-4 mr-1" />
+                        <span>Manage</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-0">
+                      <div className="py-1">
+                        <Link 
+                          to="/admin/add-product" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+                        >
+                          Add Product
+                        </Link>
+                        <Link 
+                          to="/admin/manage-categories" 
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
+                        >
+                          Manage Categories
+                        </Link>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 )}
 
                 {/* Account */}
@@ -213,9 +232,14 @@ const AmazonHeader = () => {
                     </button>
                     <div className="absolute top-full right-0 bg-white border shadow-lg py-2 px-4 text-black text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all rounded">
                       {isAdmin && (
-                        <Link to="/admin/add-product" className="block py-1 hover:text-red-600 whitespace-nowrap">
-                          Admin Panel
-                        </Link>
+                        <>
+                          <Link to="/admin/add-product" className="block py-1 hover:text-red-600 whitespace-nowrap">
+                            Add Product
+                          </Link>
+                          <Link to="/admin/manage-categories" className="block py-1 hover:text-red-600 whitespace-nowrap">
+                            Manage Categories
+                          </Link>
+                        </>
                       )}
                       <Link to="/profile" className="block py-1 hover:text-red-600">Profile</Link>
                       <button onClick={signOut} className="block py-1 hover:text-red-600 text-left w-full">
@@ -292,40 +316,58 @@ const AmazonHeader = () => {
                       <div className="w-1/3 bg-stone-50 border-r border-stone-200">
                         <div className="p-6">
                           <h3 className="font-bold text-xl mb-4 text-stone-900">Shop by Category</h3>
-                          <ul className="space-y-1">
-                            {Object.keys(categories).map(category => (
-                              <li key={category}>
-                                <button
-                                  onMouseEnter={() => setActiveCategory(category)}
-                                  onClick={() => handleCategoryClick(category)}
-                                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                                    activeCategory === category
-                                      ? 'bg-red-100 text-red-800 font-medium border-l-4 border-red-600'
-                                      : 'hover:bg-stone-100 text-stone-700 hover:text-red-600'
-                                  }`}
-                                >
-                                  {category}
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
+                          {isLoading ? (
+                            <div className="text-center py-4">Loading categories...</div>
+                          ) : (
+                            <ul className="space-y-1">
+                              {Object.keys(categoryMap).map(categoryName => {
+                                const mainCategory = categories.find(cat => cat.name === categoryName && cat.parent_id === null);
+                                if (!mainCategory) return null;
+                                
+                                return (
+                                  <li key={mainCategory.id}>
+                                    <button
+                                      onMouseEnter={() => setActiveCategory(categoryName)}
+                                      onClick={() => handleCategoryClick(mainCategory)}
+                                      className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                                        activeCategory === categoryName
+                                          ? 'bg-red-100 text-red-800 font-medium border-l-4 border-red-600'
+                                          : 'hover:bg-stone-100 text-stone-700 hover:text-red-600'
+                                      }`}
+                                    >
+                                      {categoryName}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
                         </div>
                       </div>
 
                       {/* Right Section - Subcategories */}
                       <div className="w-2/3 p-6 bg-white">
                         <h3 className="font-bold text-xl mb-4 text-stone-900 border-b border-stone-200 pb-2">{activeCategory}</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          {categories[activeCategory as keyof typeof categories]?.map(subcategory => (
-                            <button
-                              key={subcategory}
-                              onClick={() => handleSubcategoryClick(subcategory)}
-                              className="text-left px-4 py-3 text-stone-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-200"
-                            >
-                              {subcategory}
-                            </button>
-                          ))}
-                        </div>
+                        {isLoading ? (
+                          <div className="text-center py-4">Loading subcategories...</div>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-3">
+                            {categoryMap[activeCategory]?.map(subcategory => (
+                              <button
+                                key={subcategory.id}
+                                onClick={() => handleSubcategoryClick(subcategory)}
+                                className="text-left px-4 py-3 text-stone-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-200"
+                              >
+                                {subcategory.name}
+                              </button>
+                            ))}
+                            {categoryMap[activeCategory]?.length === 0 && (
+                              <div className="col-span-2 text-center py-4 text-stone-500">
+                                No subcategories found
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

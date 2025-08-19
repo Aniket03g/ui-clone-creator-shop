@@ -24,10 +24,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import Electronics from "./pages/Electronics";
-import AddProduct from "./pages/AddProduct";
+import ProductForm from "./pages/ProductForm";
 import Auth from "./pages/Auth";
 import UpdatePassword from "./pages/UpdatePassword";
 import Category from "./pages/Category";
+import MainLayout from "@/components/MainLayout";
+import ManageCategories from "./pages/ManageCategories";
 
 const queryClient = new QueryClient();
 
@@ -43,40 +45,65 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/login" element={<Index />} />
-                  <Route path="/store" element={<Products />} />
-                  <Route path="/laptops" element={<Products />} />
-                  <Route path="/routers" element={<Products />} />
-                  <Route path="/pcs" element={<Products />} />
-                  <Route path="/ups" element={<Products />} />
-                  <Route path="/components" element={<Products />} />
-                  <Route path="/electronics" element={<Electronics />} />
-                  <Route path="/monitors" element={<Products />} />
-                  <Route path="/keyboards" element={<Products />} />
-                  <Route path="/accessories" element={<Products />} />
-                  <Route path="/deals" element={<Products />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/category/:slug" element={<Category />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/wishlist" element={<Wishlist />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/shipping-policy" element={<ShippingPolicy />} />
-                  <Route path="/returns-policy" element={<ReturnsPolicy />} />
-                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/terms-of-service" element={<TermsOfService />} />
-                  <Route path="/terms" element={<TermsOfService />} />
+                  {/* Public auth-related routes without layout if desired */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/update-password" element={<UpdatePassword />} />
+
+                  {/* Main site layout with header/footer */}
+                  <Route element={<MainLayout />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/login" element={<Index />} />
+                    <Route path="/store" element={<Products />} />
+
+                    {/* Category routes - all point to the same Category component */}
+                    <Route path="/laptops" element={<Category />} />
+                    <Route path="/routers" element={<Category />} />
+                    <Route path="/pcs" element={<Category />} />
+                    <Route path="/ups" element={<Category />} />
+                    <Route path="/components" element={<Category />} />
+                    <Route path="/electronics" element={<Category />} />
+                    <Route path="/monitors" element={<Category />} />
+                    <Route path="/keyboards" element={<Category />} />
+                    <Route path="/mice" element={<Category />} />
+                    <Route path="/headphones" element={<Category />} />
+                    {/* Keep the category/:slug route for backward compatibility */}
+                    <Route path="/category/:slug" element={<Category />} />
+
+                    {/* Product details under main layout */}
+                    <Route path="/product/:id" element={<ProductDetail />} />
+
+                    {/* Misc pages */}
+                    <Route path="/about" element={<About />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/search" element={<SearchResults />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                    <Route path="/returns-policy" element={<ReturnsPolicy />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/terms" element={<TermsOfService />} />
+                  </Route>
+
+                  {/* Admin routes */}
                   <Route path="/admin/add-product" element={
                     <AdminRoute>
-                      <AddProduct />
+                      <ProductForm />
                     </AdminRoute>
                   } />
+                  <Route path="/admin/edit-product/:id" element={
+                    <AdminRoute>
+                      <ProductForm />
+                    </AdminRoute>
+                  } />
+                  <Route path="/admin/manage-categories" element={
+                    <AdminRoute>
+                      <ManageCategories />
+                    </AdminRoute>
+                  } />
+
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

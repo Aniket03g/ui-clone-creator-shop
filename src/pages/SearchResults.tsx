@@ -4,7 +4,6 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
-import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
@@ -196,7 +195,6 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}

@@ -12,7 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Check, ChevronsUpDown, Loader2, Upload, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 
@@ -20,15 +20,19 @@ import { cn } from "@/lib/utils";
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   description: z.string().min(1, 'Description is required'),
-  price: z.preprocess((val) => Number(val), z.number().min(0, 'Price must be positive')),
+  price: z.preprocess(
+    (val) => (String(val).trim() === '' ? NaN : Number(val)),
+    z.number().min(0, 'Price must be a positive number')
+  ),
   sku: z.string().min(1, 'SKU is required'),
-  stock_quantity: z.preprocess((val) => Number(val), z.number().min(0, 'Stock quantity must be positive')),
+  stock_quantity: z.preprocess(
+    (val) => (String(val).trim() === '' ? NaN : Number(val)),
+    z.number().int().min(0, 'Stock must be a positive whole number')
+  ),
   status: z.enum(['draft', 'published']),
   product_type: z.enum(['laptop', 'router', 'ups', 'software', 'monitor', 'keyboard', 'mouse', 'headphones', 'all-in-one-pc'], { required_error: "Product type is required." }),
   main_category: z.string({ required_error: "Main category is required." }).min(1, "Main category is required."),
   sub_categories: z.array(z.string()).optional(),
-
-  // Dynamic specifications fields
   brand: z.string().optional(),
   cpu: z.string().optional(),
   ram_gb: z.string().optional(),
@@ -67,7 +71,19 @@ export default function ProductForm() {
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      status: 'draft', price: 0, stock_quantity: 0, sub_categories: [],
+      name: '',
+      description: '',
+      price: 0,
+      sku: '',
+      stock_quantity: 0,
+      status: 'draft',
+      sub_categories: [],
+      brand: '',
+      cpu: '',
+      ram_gb: '',
+      storage_gb: '',
+      gpu: '',
+      // Initialize all other spec fields to prevent uncontrolled component warning
     },
   });
 
@@ -103,22 +119,68 @@ export default function ProductForm() {
     } else {
       setSubCategoryOptions([]);
     }
-    form.setValue('sub_categories', []);
+    if (form.getValues('main_category') === watchedMainCategory) {
+        form.setValue('sub_categories', []);
+    }
   }, [watchedMainCategory, allCategories, form]);
   
-  // ... (add your existing useEffect for fetching product data in edit mode here)
+  const onValidationErrors = (errors: any) => {
+    console.error("Form Validation Failed:", errors);
+    toast({
+      title: "Validation Error",
+      description: "Please check the form for errors. Required fields cannot be empty.",
+      variant: "destructive",
+    });
+  };
 
   const onSubmit = async (data: ProductFormData) => {
-    // ... (your existing submission logic here)
+    setIsSubmitting(true);
+    
+    const finalCategories = [
+        ...(data.main_category ? [data.main_category] : []),
+        ...(data.sub_categories || [])
+    ];
+
+    const { name, description, price, sku, stock_quantity, status, product_type, main_category, sub_categories, ...specifications } = data;
+
+    const productPayload = {
+      name, description, price, sku, stock_quantity, status, product_type,
+      categories: finalCategories,
+      specifications,
+      // images: [], // Add your image handling logic here
+    };
+
+    const { error } = isEditMode
+      ? await supabase.from('products').update(productPayload).eq('id', id)
+      : await supabase.from('products').insert(productPayload);
+
+    if (error) {
+      toast({ title: `Error`, description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: `Product ${isEditMode ? 'updated' : 'created'} successfully!` });
+      navigate('/admin/manage-categories');
+    }
+    setIsSubmitting(false);
   };
   
   const renderSpecificationFields = () => {
+    // This is where your full switch statement for all product types goes.
     if (!watchedProductType) return null;
     return (
         <Card>
-          <CardHeader><CardTitle>{watchedProductType.charAt(0).toUpperCase() + watchedProductType.slice(1)} Specifications</CardTitle></CardHeader>
-          <CardContent>
-            {/* Your full switch statement for all product types goes here. */}
+          <CardHeader><CardTitle>{productTypes.find(p=>p.value === watchedProductType)?.label} Specifications</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {watchedProductType === 'laptop' && (
+              <>
+                <FormField control={form.control} name="brand" render={({ field }) => (
+                    <FormItem><FormLabel>Brand</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="cpu" render={({ field }) => (
+                    <FormItem><FormLabel>CPU</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+              </>
+            )}
+            {/* ... Cases for other product types ... */}
           </CardContent>
         </Card>
     );
@@ -130,21 +192,21 @@ export default function ProductForm() {
       <p className="text-muted-foreground">{isEditMode ? 'Update details' : 'Fill in details for a new product.'}</p>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onValidationErrors)} className="space-y-8 mt-6">
           
           <Card>
             <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem><FormLabel>Product Name *</FormLabel><FormControl><Input {...field} placeholder="e.g., Dell XPS 15" /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Product Name *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="sku" render={({ field }) => (
-                  <FormItem><FormLabel>SKU *</FormLabel><FormControl><Input {...field} placeholder="e.g., DXP15-001" /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>SKU *</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
               </div>
               <FormField control={form.control} name="description" render={({ field }) => (
-                <FormItem><FormLabel>Description *</FormLabel><FormControl><Textarea {...field} placeholder="Describe your product..." /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Description *</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
               )} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField control={form.control} name="price" render={({ field }) => (
@@ -153,13 +215,13 @@ export default function ProductForm() {
                 <FormField control={form.control} name="stock_quantity" render={({ field }) => (
                   <FormItem><FormLabel>Stock Quantity *</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
-                <FormField control={form.control} name="status" render={({ field }) => (
+                 <FormField control={form.control} name="status" render={({ field }) => (
                   <FormItem><FormLabel>Status *</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl><SelectContent><SelectItem value="draft">Draft</SelectItem><SelectItem value="published">Published</SelectItem></SelectContent></Select><FormMessage /></FormItem>
                 )} />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader><CardTitle>Categorization</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">

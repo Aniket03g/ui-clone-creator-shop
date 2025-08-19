@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Heart, Grid, List, ShoppingCart } from 'lucide-react';
-import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/hooks/use-toast';
@@ -203,7 +202,6 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}

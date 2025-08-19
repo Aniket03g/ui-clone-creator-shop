@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, ShoppingCart } from 'lucide-react';
-import Header from '@/components/Header';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
@@ -37,7 +36,6 @@ const Wishlist = () => {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-2 text-sm text-stone-600 mb-8">

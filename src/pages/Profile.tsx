@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, Edit, MapPin, Phone, Mail, User as UserIcon } from 'lucide-react';
-import Header from '@/components/Header';
 
 const Profile = () => {
   const { user, updateProfile, addAddress, updateAddress, deleteAddress, logout } = useUser();
@@ -73,7 +72,6 @@ const Profile = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-stone-50">
-        <Header />
         <div className="flex items-center justify-center min-h-[80vh]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-stone-900 mb-4">Please sign in to view your profile</h1>
@@ -86,7 +84,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <Header />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
