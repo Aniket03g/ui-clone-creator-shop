@@ -16,32 +16,14 @@ interface Product {
   description?: string;
   images: string[];
   product_type: string;
+  categories?: string[];
   specifications: any;
   sku?: string;
   stock_quantity: number;
   status: string;
 }
 
-// Updated category mappings covering all routes and product types
-const mainCategoryMappings: Record<string, string[]> = {
-  'laptops-and-computers': ['laptop', 'monitor', 'peripheral'],
-  'computer-components': ['component'],
-  'networking-and-internet': ['router'],
-  'power-and-ups': ['ups'],
-  'software-and-licenses': ['software'],
-  'accessories-and-peripherals': ['accessory', 'keyboard', 'mouse', 'headphones'],
-  // Existing routes
-  'laptops': ['laptop'],
-  'routers': ['router'],
-  'monitors': ['monitor'],
-  'keyboards': ['keyboard'],
-  'mice': ['mouse'],
-  'headphones': ['headphones'],
-  'pcs': ['component'],
-  'electronics': ['laptop', 'monitor', 'router', 'ups', 'keyboard', 'mouse', 'headphones', 'component', 'peripheral']
-};
-
-// This maps URL slugs to display names
+// This maps URL slugs to display names (keeping this for display purposes only)
 const categoryDisplayNames: Record<string, string> = {
   'laptops': 'Laptops',
   'monitors': 'Monitors',
@@ -112,37 +94,30 @@ const Category = () => {
     }
 
     console.group('Fetching Products');
+    console.log('--- Category Page Debug ---');
+    console.log('URL Slug being used:', slug);
     console.log('Current slug:', slug);
-    console.log('Available mappings:', Object.keys(mainCategoryMappings));
     
     setLoading(true);
     
     try {
-      // Get the product types for the current category slug
-      const productTypes = mainCategoryMappings[slug as keyof typeof mainCategoryMappings] || [];
-      console.log('Mapped product types for category:', { slug, productTypes });
-
-      if (productTypes.length === 0) {
-        console.warn(`No product types mapped for slug: ${slug}`);
-        setProducts([]);
-        setCategoryName(slugToTitle(slug));
-        return;
-      }
-
-      console.log('Executing Supabase query with server-side filtering...');
+      console.log('Executing Supabase query with categories filtering...');
+      console.log('Querying Supabase for products where "categories" contains:', [slug]);
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('status', 'published')
-        .in('product_type', productTypes);
+        .contains('categories', [slug]);
 
       if (error) {
         console.error('Supabase query error:', error);
         throw new Error(`Error fetching products: ${error.message}`);
       }
 
+      console.log('Raw Supabase Response:', { data, error });
       setProducts(data || []);
       setCategoryName(slugToTitle(slug));
+      console.log('Final number of products found for this page:', (data || []).length);
       
       if (!data || data.length === 0) {
         console.warn('No products returned for this category');
@@ -170,12 +145,17 @@ const Category = () => {
   };
 
   const handleAddToCart = (product: Product) => {
+    // Get the first category from categories array if available, otherwise fallback to product_type
+    const category = Array.isArray(product.categories) && product.categories.length > 0 
+      ? product.categories[0] 
+      : product.product_type;
+      
     addToCart({
       id: parseInt(product.id) || 0,
       name: product.name,
       price: product.price,
       image: product.images[0] || '/placeholder.svg',
-      category: product.product_type
+      category: category
     });
     
     toast({
@@ -186,12 +166,18 @@ const Category = () => {
 
   const handleWishlistToggle = (product: Product) => {
     const productId = parseInt(product.id) || 0;
+    
+    // Get the first category from categories array if available, otherwise fallback to product_type
+    const category = Array.isArray(product.categories) && product.categories.length > 0 
+      ? product.categories[0] 
+      : product.product_type;
+      
     const wishlistItem = {
       id: productId,
       name: product.name,
       price: product.price,
       image: product.images[0] || '/placeholder.svg',
-      category: product.product_type
+      category: category
     };
 
     if (isInWishlist(productId)) {

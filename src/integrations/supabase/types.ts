@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          id: string
+          user_id: string
+          type: 'home' | 'work' | 'other'
+          street: string
+          city: string
+          state: string
+          zip_code: string
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'home' | 'work' | 'other'
+          street: string
+          city: string
+          state: string
+          zip_code: string
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'home' | 'work' | 'other'
+          street?: string
+          city?: string
+          state?: string
+          zip_code?: string
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      },
       categories: {
         Row: {
           id: string
@@ -93,37 +132,34 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
+      },
       profiles: {
         Row: {
-          created_at: string
-          first_name: string | null
           id: string
-          last_name: string | null
-          phone: string | null
+          full_name: string | null
+          phone_number: string | null
+          address: Json | null
+          created_at: string
           updated_at: string
-          user_id: string
         }
         Insert: {
+          id: string
+          full_name?: string | null
+          phone_number?: string | null
+          address?: Json | null
           created_at?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          phone?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
-          created_at?: string
-          first_name?: string | null
           id?: string
-          last_name?: string | null
-          phone?: string | null
+          full_name?: string | null
+          phone_number?: string | null
+          address?: Json | null
+          created_at?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
-      }
+      },
       user_roles: {
         Row: {
           created_at: string

@@ -1,293 +1,524 @@
-
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Loader2, Save, Edit, User, Phone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useUser } from '@/contexts/UserContext';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Plus, Edit, MapPin, Phone, Mail, User as UserIcon } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-const Profile = () => {
-  const { user, updateProfile, addAddress, updateAddress, deleteAddress, logout } = useUser();
+// Define the form schema with zod
+const profileFormSchema = z.object({
+  full_name: z.string().optional(),
+  phone_number: z.string().optional(),
+  shipping_address: z.object({
+    street: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    postal_code: z.string().optional(),
+    country: z.string().optional(),
+  }).optional(),
+});
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+// Define database profile structure
+interface DatabaseProfile {
+  id: string;
+  full_name: string | null;
+  phone_number: string | null;
+  address?: any;
+  shipping_address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Define the profile data structure for our app
+interface Profile {
+  id: string;
+  full_name: string | null;
+  phone_number: string | null;
+  shipping_address: {
+    street?: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
+  } | null;
+}
+
+export default function Profile() {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [isAddingAddress, setIsAddingAddress] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const [profileData, setProfileData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || ''
+  // Initialize the form with react-hook-form
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      full_name: '',
+      phone_number: '',
+      shipping_address: {
+        street: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: '',
+      },
+    },
   });
 
-  const [addressData, setAddressData] = useState({
-    type: 'home' as 'home' | 'work' | 'other',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    isDefault: false
-  });
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
+      setIsLoading(true);
+      
+      try {
+        // First try to get the profile
+        let { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle(); // Use maybeSingle instead of single to avoid error when no profile exists
+        
+        // If profile doesn't exist, create one
+        if (!data && !error) {
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{ id: user.id }])
+            .select()
+            .single();
+          
+          if (insertError) {
+            console.error('Error creating profile:', insertError);
+            toast({
+              title: 'Error',
+              description: 'Failed to create profile.',
+              variant: 'destructive',
+            });
+          } else {
+            data = newProfile;
+          }
+        } else if (error && error.code !== 'PGRST116') { // PGRST116 is the 'no rows returned' error
+          console.error('Error fetching profile:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to load profile data.',
+            variant: 'destructive',
+          });
+        }
+        
+        if (data) {
+          // Explicitly cast the data to handle any schema differences
+          const profileData = data as any;
+          
+          // Get address data from either shipping_address or address field
+          const addressData = profileData.shipping_address || profileData.address || null;
+          
+          // Transform database data to match our Profile type
+          const transformedProfile: Profile = {
+            id: profileData.id,
+            full_name: profileData.full_name || null,
+            phone_number: profileData.phone_number || null,
+            shipping_address: addressData
+          };
+          
+          setProfile(transformedProfile);
+          
+          // Update form values with profile data
+          form.reset({
+            full_name: transformedProfile.full_name || '',
+            phone_number: transformedProfile.phone_number || '',
+            shipping_address: addressData || {
+              street: '',
+              city: '',
+              state: '',
+              postal_code: '',
+              country: '',
+            },
+          });
+        } else {
+          // If we still don't have a profile, create a default one in the state
+          // This won't be saved to the database until the user submits the form
+          const defaultProfile: Profile = {
+            id: user.id,
+            full_name: null,
+            phone_number: null,
+            shipping_address: null
+          };
+          
+          setProfile(defaultProfile);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: 'Error',
+          description: 'An unexpected error occurred.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateProfile(profileData);
-    setIsEditingProfile(false);
-    toast({
-      title: "Profile updated",
-      description: "Your profile has been updated successfully.",
-    });
+    fetchUserProfile();
+  }, [user, toast, form]);
+
+  // Toggle between view and edit modes
+  const toggleEditMode = () => {
+    if (isEditMode && form.formState.isDirty) {
+      // If switching from edit mode with unsaved changes, confirm first
+      if (window.confirm('You have unsaved changes. Discard changes?')) {
+        setIsEditMode(false);
+        // Reset form to current profile values
+        if (profile) {
+          form.reset({
+            full_name: profile.full_name || '',
+            phone_number: profile.phone_number || '',
+            shipping_address: profile.shipping_address || {
+              street: '',
+              city: '',
+              state: '',
+              postal_code: '',
+              country: '',
+            },
+          });
+        }
+      }
+    } else {
+      setIsEditMode(!isEditMode);
+    }
   };
 
-  const handleAddAddress = (e: React.FormEvent) => {
-    e.preventDefault();
-    addAddress(addressData);
-    setAddressData({
-      type: 'home',
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      isDefault: false
-    });
-    setIsAddingAddress(false);
-    toast({
-      title: "Address added",
-      description: "Your address has been added successfully.",
-    });
-  };
-
-  const handleDeleteAddress = (addressId: string) => {
-    deleteAddress(addressId);
-    toast({
-      title: "Address deleted",
-      description: "Your address has been deleted successfully.",
-    });
+  // Handle form submission
+  const onSubmit = async (values: ProfileFormValues) => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    
+    try {
+      // Prepare data for update or insert
+      const profileData: any = {
+        id: user.id,
+        full_name: values.full_name,
+        phone_number: values.phone_number,
+        shipping_address: values.shipping_address,
+      };
+      
+      // Check if profile exists
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      let error;
+      
+      if (existingProfile) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('id', user.id);
+          
+        error = updateError;
+      } else {
+        // Insert new profile
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([profileData]);
+          
+        error = insertError;
+      }
+      
+      if (error) {
+        console.error('Error saving profile:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to save profile.',
+          variant: 'destructive',
+        });
+      } else {
+        // Update local state
+        setProfile({
+          id: user.id,
+          full_name: values.full_name || null,
+          phone_number: values.phone_number || null,
+          shipping_address: values.shipping_address || null,
+        });
+        
+        toast({
+          title: 'Success',
+          description: 'Your profile has been updated.',
+        });
+        
+        // Exit edit mode after successful save
+        setIsEditMode(false);
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-stone-50">
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-stone-900 mb-4">Please sign in to view your profile</h1>
-            <Button onClick={() => window.location.href = '/'}>Go to Home</Button>
-          </div>
-        </div>
+      <div className="container mx-auto py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile</CardTitle>
+            <CardDescription>You need to be logged in to view your profile.</CardDescription>
+          </CardHeader>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-stone-900">My Account</h1>
-          <Button variant="outline" onClick={logout}>Sign Out</Button>
+    <div className="container mx-auto py-10">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Your Profile</h1>
+          <Button 
+            onClick={toggleEditMode} 
+            variant={isEditMode ? "outline" : "default"}
+            className="flex items-center gap-2"
+          >
+            {isEditMode ? 'Cancel' : (
+              <>
+                <Edit className="h-4 w-4" />
+                Edit Profile
+              </>
+            )}
+          </Button>
         </div>
-
-        <div className="grid gap-6">
-          {/* Profile Information */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <UserIcon className="w-5 h-5" />
-                Profile Information
-              </CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setIsEditingProfile(true)}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {isEditingProfile ? (
-                <form onSubmit={handleProfileUpdate} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        value={profileData.firstName}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        value={profileData.lastName}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                      />
-                    </div>
-                  </div>
+        
+        {/* Account Summary */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Account Information</CardTitle>
+            <CardDescription>Your basic account details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-gray-500" />
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                    />
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium">{user.email}</p>
                   </div>
-                  <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={profileData.phone}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button type="submit">Save Changes</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsEditingProfile(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <UserIcon className="w-4 h-4 text-stone-500" />
-                    <span>{user.firstName} {user.lastName}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-stone-500" />
-                    <span>{user.email}</span>
-                  </div>
-                  {user.phone && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-stone-500" />
-                      <span>{user.phone}</span>
-                    </div>
-                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Addresses */}
+                
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Full Name</p>
+                    <p className="font-medium">{profile?.full_name || 'Not provided'}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Phone Number</p>
+                    <p className="font-medium">{profile?.phone_number || 'Not provided'}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">Shipping Address</p>
+                    {profile?.shipping_address?.street ? (
+                      <div className="font-medium">
+                        <p>{profile.shipping_address.street}</p>
+                        {profile.shipping_address.city && (
+                          <p>
+                            {profile.shipping_address.city}
+                            {profile.shipping_address.state && `, ${profile.shipping_address.state}`} 
+                            {profile.shipping_address.postal_code && ` ${profile.shipping_address.postal_code}`}
+                          </p>
+                        )}
+                        {profile.shipping_address.country && <p>{profile.shipping_address.country}</p>}
+                      </div>
+                    ) : (
+                      <p className="font-medium">Not provided</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Edit Profile Form - Only shown in edit mode */}
+        {isEditMode && (
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
-                Saved Addresses
-              </CardTitle>
-              <Dialog open={isAddingAddress} onOpenChange={setIsAddingAddress}>
-                <DialogTrigger asChild>
-                  <Button size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Address
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Address</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleAddAddress} className="space-y-4">
-                    <div>
-                      <Label htmlFor="type">Address Type</Label>
-                      <Select value={addressData.type} onValueChange={(value: 'home' | 'work' | 'other') => setAddressData(prev => ({ ...prev, type: value }))}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="home">Home</SelectItem>
-                          <SelectItem value="work">Work</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="street">Street Address</Label>
-                      <Input
-                        id="street"
-                        value={addressData.street}
-                        onChange={(e) => setAddressData(prev => ({ ...prev, street: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="city">City</Label>
-                        <Input
-                          id="city"
-                          value={addressData.city}
-                          onChange={(e) => setAddressData(prev => ({ ...prev, city: e.target.value }))}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="state">State</Label>
-                        <Input
-                          id="state"
-                          value={addressData.state}
-                          onChange={(e) => setAddressData(prev => ({ ...prev, state: e.target.value }))}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="zipCode">ZIP Code</Label>
-                      <Input
-                        id="zipCode"
-                        value={addressData.zipCode}
-                        onChange={(e) => setAddressData(prev => ({ ...prev, zipCode: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full">Add Address</Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
+            <CardHeader>
+              <CardTitle>Edit Profile</CardTitle>
+              <CardDescription>Update your personal information</CardDescription>
             </CardHeader>
             <CardContent>
-              {user.addresses.length === 0 ? (
-                <p className="text-stone-500">No addresses saved yet.</p>
+              {isLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
               ) : (
-                <div className="space-y-4">
-                  {user.addresses.map((address) => (
-                    <div key={address.id} className="border rounded-lg p-4 flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-stone-100 text-stone-700 px-2 py-1 rounded text-sm capitalize">
-                            {address.type}
-                          </span>
-                          {address.isDefault && (
-                            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">
-                              Default
-                            </span>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="full_name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your full name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your phone number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Shipping Address</h3>
+                      
+                      <FormField
+                        control={form.control}
+                        name="shipping_address.street"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your street address" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="shipping_address.city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter your city" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
-                        </div>
-                        <p className="text-stone-900">{address.street}</p>
-                        <p className="text-stone-600">{address.city}, {address.state} {address.zipCode}</p>
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="shipping_address.state"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>State/Province</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter your state/province" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteAddress(address.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="shipping_address.postal_code"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Postal Code</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter your postal code" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="shipping_address.country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter your country" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    
+                    <Button type="submit" disabled={isSaving} className="w-full">
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </Form>
               )}
             </CardContent>
           </Card>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default Profile;
+}

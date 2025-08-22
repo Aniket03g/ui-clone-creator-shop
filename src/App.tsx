@@ -9,6 +9,7 @@ import { SearchProvider } from "@/contexts/SearchContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AdminRoute from "@/components/AdminRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -78,7 +79,7 @@ const App = () => (
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/search" element={<SearchResults />} />
-                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/shipping-policy" element={<ShippingPolicy />} />
                     <Route path="/returns-policy" element={<ReturnsPolicy />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
