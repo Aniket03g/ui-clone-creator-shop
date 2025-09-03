@@ -3,12 +3,13 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Edit } from 'lucide-react';
+import { Heart, Edit, Circle } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const specLabelMap: Record<string, string> = {
   cpu: 'CPU',
@@ -74,13 +75,34 @@ const formatSpecValue = (value: any): string => {
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const [selectedImage, setSelectedImage] = useState(0);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+
+  // Track current slide when carousel API changes
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    };
+
+    carouselApi.on('select', onSelect);
+    carouselApi.on('reInit', onSelect);
+
+    // Call once to set initial slide
+    onSelect();
+
+    return () => {
+      carouselApi.off('select', onSelect);
+      carouselApi.off('reInit', onSelect);
+    };
+  }, [carouselApi]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -246,30 +268,58 @@ const ProductDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Images - Sticky Container */}
-          <div className="lg:sticky lg:top-8 lg:self-start space-y-4">
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100">
-              <img
-                src={product.images?.[selectedImage] || '/placeholder.svg'}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
+          <div className="lg:sticky lg:top-8 lg:self-start space-y-6">
+            <Carousel className="w-full" setApi={setCarouselApi}>
+              <CarouselContent>
+                {product.images?.length > 0 ? (
+                  product.images.map((image: string, index: number) => (
+                    <CarouselItem key={index}>
+                      <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100">
+                        <img
+                          src={image || '/placeholder.svg'}
+                          alt={`${product.name} ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))
+                ) : (
+                  <CarouselItem>
+                    <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100">
+                      <img
+                        src="/placeholder.svg"
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                )}
+              </CarouselContent>
+              
+              {product.images?.length > 1 && (
+                <>
+                  <CarouselPrevious className="-left-4 lg:-left-6" />
+                  <CarouselNext className="-right-4 lg:-right-6" />
+                </>
+              )}
+            </Carousel>
+            
+            {/* Dot indicators */}
             {product.images?.length > 1 && (
-              <div className="flex space-x-4">
-                {product.images.map((image: string, index: number) => (
+              <div className="flex justify-center space-x-2 mt-4">
+                {product.images.map((_: string, index: number) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square w-20 rounded-lg overflow-hidden border-2 ${
-                      selectedImage === index ? 'border-stone-400' : 'border-stone-200'
+                    onClick={() => {
+                      if (carouselApi) {
+                        carouselApi.scrollTo(index);
+                      }
+                    }}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                      currentSlide === index ? 'bg-red-600' : 'bg-stone-300'
                     }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
                 ))}
               </div>
             )}
